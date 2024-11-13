@@ -3,3 +3,4 @@ torch
 gymnasium
 tetris-gymnasium
 opencv-python
+pyautogui
