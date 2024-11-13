@@ -11,7 +11,7 @@ MAX_STEPS = 1000
 data_dir = "data"
 os.makedirs(data_dir, exist_ok=True)
 seed = np.random.randint(0, 100000)
-file_name = f"BC_data_{seed}_{MAX_STEPS}_{len(os.listdir(data_dir))}.npy"
+file_name = f"BC_data_{len(os.listdir(data_dir))}_{seed}_{MAX_STEPS}.npy"
 
 # Create an instance of Tetris
 env = gym.make("tetris_gymnasium/Tetris", render_mode="human", render_upscale=30)
