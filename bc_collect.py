@@ -16,11 +16,10 @@ seed = np.random.randint(0, 1000000)
 file_name = f"BC_data_{str(num).zfill(3)}_{str(seed).zfill(6)}_{MAX_STEPS}.npy"
 
 # Create an instance of Tetris
-
 rewards_mapping = RewardsMapping()
 rewards_mapping.game_over = -100
 rewards_mapping.invalid_action = -10
-env = gym.make("tetris_gymnasium/Tetris", render_mode="human", render_upscale=30, rewards_mapping=rewards_mapping)
+env = gym.make("tetris_gymnasium/Tetris", render_mode="human", render_upscale=40, rewards_mapping=rewards_mapping)
 observation = env.reset(seed=seed)
 
 # Initialize data array of MAX_STEPS
