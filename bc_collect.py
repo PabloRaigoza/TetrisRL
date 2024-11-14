@@ -37,6 +37,7 @@ while not terminated and steps < MAX_STEPS:
         elif key == ord("'"): action = env.unwrapped.actions.rotate_clockwise
         elif key == ord(" "): action = env.unwrapped.actions.hard_drop
         elif key == ord("c"): action = env.unwrapped.actions.swap
+        elif key == ord("t"): action = env.unwrapped.actions.no_op
 
     # Perform the action
     observation, reward, terminated, truncated, info = env.step(action)
