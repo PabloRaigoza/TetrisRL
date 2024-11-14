@@ -4,4 +4,4 @@ build:
 	venv/bin/pip install --upgrade pip setuptools wheel
 
 collect_bc:
-	venv/bin/python -m data.collect_bc.py
+	venv/bin/python -m data.collect_bc
