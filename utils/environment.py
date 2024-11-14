@@ -18,7 +18,7 @@ def makeBC():
     return gym.make(
         "tetris_gymnasium/Tetris",
         render_mode="human",
-        render_upscale=30,
+        render_upscale=40,
         rewards_mapping=rewards_mapping
     )
 
