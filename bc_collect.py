@@ -1,4 +1,5 @@
 from tetris_gymnasium.envs import Tetris
+from tetris_gymnasium.mappings.rewards import RewardsMapping
 import gymnasium as gym
 import numpy as np
 import sys
@@ -10,18 +11,23 @@ MAX_STEPS = 1000
 # Create data directory
 data_dir = "data"
 os.makedirs(data_dir, exist_ok=True)
-seed = np.random.randint(0, 100000)
-file_name = f"BC_data_{len(os.listdir(data_dir))}_{seed}_{MAX_STEPS}.npy"
+num = len(os.listdir(data_dir))
+seed = np.random.randint(0, 1000000)
+file_name = f"BC_data_{str(num).zfill(3)}_{str(seed).zfill(6)}_{MAX_STEPS}.npy"
 
 # Create an instance of Tetris
-env = gym.make("tetris_gymnasium/Tetris", render_mode="human", render_upscale=30)
-env.reset(seed=seed)
+
+rewards_mapping = RewardsMapping()
+rewards_mapping.game_over = -100
+rewards_mapping.invalid_action = -10
+env = gym.make("tetris_gymnasium/Tetris", render_mode="human", render_upscale=30, rewards_mapping=rewards_mapping)
+observation = env.reset(seed=seed)
 
 # Initialize data array of MAX_STEPS
 data = np.array([{} for _ in range(MAX_STEPS)])
-# Main game loop
 terminated = False
 steps = 0
+
 while not terminated and steps < MAX_STEPS:
     # Render the current state of the game as text
     env.render()
@@ -39,26 +45,24 @@ while not terminated and steps < MAX_STEPS:
         elif key == ord("c"): action = env.unwrapped.actions.swap
         elif key == ord("t"): action = env.unwrapped.actions.no_op
 
-    # Perform the action
-    observation, reward, terminated, truncated, info = env.step(action)
+    obs, reward, terminated, truncated, info = env.step(action)
 
     # Save the observation
-    observation['action'] = action
-    observation['reward'] = reward
-    observation['terminated'] = terminated
-    observation['info'] = info
-    observation['truncated'] = truncated
-
-    # Save the observation
-    # with open(os.path.join(data_dir, file_name), "ab") as f:
-    #     np.save(f, observation)
-    data[steps] = observation
+    data[steps] = {
+        'state': observation,
+        'action': action,
+        'reward': reward,
+        'terminated': terminated,
+        'truncated': truncated,
+        'info': info
+    }
+    
+    observation = obs
+    steps += 1
 
     with open(os.path.join(data_dir, file_name), "wb") as f:
         np.save(f, data)
-
-    print(f"Step {steps}")
-    steps += 1
+    print(f"Step {steps-1}")
 
 # Close the environment
 env.close()
