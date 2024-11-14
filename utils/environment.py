@@ -21,5 +21,3 @@ def makeBC():
         render_upscale=40,
         rewards_mapping=rewards_mapping
     )
-
-makeBC()
