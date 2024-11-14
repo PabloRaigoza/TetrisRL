@@ -1,6 +1,7 @@
-numpy
-torch
+ipykernel
 gymnasium
-tetris-gymnasium
+numpy
 opencv-python
 pyautogui
+tetris-gymnasium
+torch

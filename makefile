@@ -1,6 +1,7 @@
 build:
-	python3 -m venv venv
-	venv/bin/pip3 install -r requirements.txt
+	python3.10 -m venv venv
+	venv/bin/pip install -r requirements.txt
+	venv/bin/pip install --upgrade pip setuptools wheel
 
-run_bc_collect:
-	venv/bin/python3 bc_collect.py
+collect_bc:
+	venv/bin/python -m data.collect_bc.py
