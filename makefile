@@ -5,3 +5,9 @@ build:
 
 collect_bc:
 	venv/bin/python -m data.collect_bc
+
+replay_bc:
+	venv/bin/python -m data.replay_bc
+
+stats:
+	venv/bin/python -m utils.stats
