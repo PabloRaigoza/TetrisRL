@@ -11,16 +11,16 @@ ACTION_DIM = 8
 
 # Agent class
 class Agent(nn.Module):
-    def __init__(self, state_dim: int, hidden_dim: int, action_dim: int):
+    def __init__(self, state_dim: int, hidden_dim: int, action_dim: int, device: str):
         super(Agent, self).__init__()
         self.state_dim  = state_dim
         self.hidden_dim = hidden_dim
         self.action_dim = action_dim
 
-        self.fc1  = nn.Linear(state_dim, hidden_dim)
-        self.fc2  = nn.Linear(hidden_dim, hidden_dim//2)
-        self.fc3  = nn.Linear(hidden_dim//2, action_dim)
-        self.drop = nn.Dropout(p=0.2)
+        self.fc1  = nn.Linear(state_dim, hidden_dim).to(device)
+        self.fc2  = nn.Linear(hidden_dim, hidden_dim//2).to(device)
+        self.fc3  = nn.Linear(hidden_dim//2, action_dim).to(device)
+        self.drop = nn.Dropout(p=0.2).to(device)
 
 
     def forward(self, x):
