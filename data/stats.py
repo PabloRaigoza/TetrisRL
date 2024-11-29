@@ -3,6 +3,7 @@ import numpy as np
 from scipy.optimize import curve_fit
 import os
 
+
 def find_demonstration_max_total_reward():
     # Read data directory
     data_dir = "data/BC"
@@ -18,6 +19,7 @@ def find_demonstration_max_total_reward():
             max_file = file
 
     print(f"Replaying {max_file} with total reward {max_reward}")
+
 
 def plot_demonstrations():
     # Read data directory
@@ -43,7 +45,9 @@ def plot_demonstrations():
     plt.xlabel("Demonstration")
     plt.ylabel("Total Reward")
     plt.legend()
-    plt.savefig("total_rewards.png", dpi=300)
+
+    os.makedirs("stats", exist_ok=True)
+    plt.savefig("stats/BC_rewards.png", dpi=300)
 
     def gaussian(x, a, b, c):
         return a * np.exp(-b * (x - c)**2)
@@ -75,7 +79,10 @@ def plot_demonstrations():
 
     plt.xlabel("Total Reward")
     plt.ylabel("Frequency")
-    plt.savefig("total_rewards_distribution.png", dpi=300)
+
+    os.makedirs("stats", exist_ok=True)
+    plt.savefig("stats/BC_rewards_dist.png", dpi=300)
+
 
 def pearson_correlation():
     # Read data directory
@@ -99,6 +106,7 @@ def pearson_correlation():
     # print(f"Pearson correlation: {np.corrcoef(total_rewards, total_rewards)[0, 1]}")
 
     print(f"Pearson correlation: {np.corrcoef(A, B)[0, 1]}")
+
 
 # find_demonstration_max_total_reward()
 plot_demonstrations()

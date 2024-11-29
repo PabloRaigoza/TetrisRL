@@ -1,10 +1,11 @@
-import torch
 from torch import nn
+import torch
+import os
 
 
 # Constants
-STATE_DIM  = 200 + 16 + 64   # active_tetromino_mask+board, holder, queue
-HIDDEN_DIM = 140   # divide by 2
+STATE_DIM  = 200 + 16 + 64   # active_tetromino_mask + board, holder, queue
+HIDDEN_DIM = 140
 ACTION_DIM = 8
 
 
@@ -21,14 +22,22 @@ class Agent(nn.Module):
         self.fc3  = nn.Linear(hidden_dim//2, action_dim)
         self.drop = nn.Dropout(p=0.2)
 
+
     def forward(self, x):
         x = x.view(-1, self.state_dim)
         h1 = self.drop(torch.relu(self.fc1(x)))
         h2 = self.drop(torch.relu(self.fc2(h1)))
-        return self.fc3(h2)
+        return torch.sigmoid(self.fc3(h2))
 
-    def load(self, path):
+
+    def load_state(self, state):
+        self.load_state_dict(state)
+
+
+    def load_path(self, path):
         self.load_state_dict(torch.load(path))
 
+
     def save(self, path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         torch.save(self.state_dict(), path)
