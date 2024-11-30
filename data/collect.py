@@ -64,7 +64,7 @@ while not terminated and steps < MAX_STEPS:
 
 
     # Update the observation
-    print(f"Step {steps + 1}/{MAX_STEPS} - Reward: {reward}")
+    print(f"Step {steps + 1}/{MAX_STEPS} - Reward: {reward}", end="\r")
     observation = obs
     steps += 1
 

@@ -1,7 +1,8 @@
 import numpy as np
 import cv2
 import sys
-from environment import makeBC 
+
+from utils.environment import makeBC
 
 
 # Checking command line arguments
@@ -18,7 +19,7 @@ seed = int(path.split('_')[3])
 
 # save the data
 data = np.load(path, allow_pickle=True)
-# Sample data path 'data/BC/BC_data_000_551896_1000.npy' 
+# Sample data path 'data/BC/BC_data_000_551896_1000.npy'
 
 # Initialize the environment
 env = makeBC()  # Use your custom Tetris environment
@@ -40,7 +41,7 @@ for step, record in enumerate(data):
     else:
         active_tetromino_mask = state['active_tetromino_mask']
         board = state['board']
-    
+
     # Create a visualization of the board
     board_height, board_width = board.shape
     cell_size = 30  # Size of each cell in pixels for visualization
@@ -54,12 +55,12 @@ for step, record in enumerate(data):
                 color = (50, 50, 50)  # Dark gray
             else:  # Occupied cell
                 color = (0, 255, 0)  # Green
-            
+
             # Draw the cell on the canvas
             top_left = (c * cell_size, r * cell_size)
             bottom_right = ((c + 1) * cell_size, (r + 1) * cell_size)
             cv2.rectangle(canvas, top_left, bottom_right, color, -1)
-    
+
     # Overlay the active tetromino
     for r in range(board_height):
         for c in range(board_width):

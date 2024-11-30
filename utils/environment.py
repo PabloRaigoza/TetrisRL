@@ -21,3 +21,13 @@ def makeBC():
         render_upscale=40,
         rewards_mapping=rewards_mapping
     )
+
+
+# DA Data Collection
+def makeDA():
+    return gym.make(
+        "tetris_gymnasium/Tetris",
+        render_mode="human",
+        render_upscale=40,
+        rewards_mapping=rewards_mapping
+    )

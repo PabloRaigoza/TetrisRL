@@ -49,12 +49,11 @@ def get_BC_data() -> np.ndarray:
     Sdata, Adata, Rdata = [], [], []
     print(f'Loading data from {path}...')
 
-    # iterate through all files in the directory
+    # Iterate through all files in the directory
     for file in os.listdir(path):
         file_data = np.load(f'{path}/{file}', allow_pickle=True)
 
-        for i, data in enumerate(file_data):
-            # assert len(data['state']) == 2, f'State length is not 2: {len(data["state"])}, {file}, {i}, \n{data["state"][0]}'
+        for data in file_data:
             if isinstance(data['state'], tuple):
                 Sdata.append(convert_data_state(data['state'][0]))
                 Adata.append(data['action'])
@@ -69,3 +68,32 @@ def get_BC_data() -> np.ndarray:
     Adata = np.array(Adata)[perm]
     Rdata = np.array(Rdata)[perm]
     return Sdata, Adata, Rdata
+
+
+def get_DA_data() -> np.ndarray:
+    path = 'data/DA'
+    Sdata, Adata, Edata = [], [], []
+    print(f'Loading data from {path}...')
+
+    if not os.path.exists(path):
+        return np.array(Sdata), np.array(Adata), np.array(Edata)
+
+    # Iterate through all files in the directory
+    for file in os.listdir(path):
+        file_data = np.load(f'{path}/{file}', allow_pickle=True)
+
+        for i, data in enumerate(file_data):
+            if isinstance(data['state'], tuple):
+                Sdata.append(convert_data_state(data['state'][0]))
+                Adata.append(data['action'])
+                Edata.append(data['expert_action'])
+            else:
+                Sdata.append(convert_data_state(data['state']))
+                Adata.append(data['action'])
+                Edata.append(data['expert_action'])
+
+    perm = np.random.permutation(len(Sdata))
+    Sdata = np.array(Sdata)[perm]
+    Adata = np.array(Adata)[perm]
+    Edata = np.array(Edata)[perm]
+    return Sdata, Adata, Edata

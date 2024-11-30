@@ -26,19 +26,15 @@ val_freq = args.val_freq
 
 
 # Getting training data
-Sdata, Adata, Rdata = get_BC_data()
+Sdata, Adata, _ = get_BC_data()
 split = int(0.8 * len(Sdata))
 
 Strain, Sval = torch.tensor(Sdata[:split], dtype=torch.float), torch.tensor(Sdata[split:], dtype=torch.float)
 Atrain, Aval = torch.tensor(Adata[:split], dtype=torch.long), torch.tensor(Adata[split:], dtype=torch.long)
-Rtrain, Rval = torch.tensor(Rdata[:split], dtype=torch.long), torch.tensor(Rdata[split:], dtype=torch.long)
 
-
-# Convert data to GPU is not on MAC
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 Strain, Sval = Strain.to(device), Sval.to(device)
 Atrain, Aval = Atrain.to(device), Aval.to(device)
-Rtrain, Rval = Rtrain.to(device), Rval.to(device)
 
 
 # Setting up agent
