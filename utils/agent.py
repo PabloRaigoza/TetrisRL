@@ -52,7 +52,7 @@ class AgentM1(BaseAgent):
         x = x.view(-1, self.state_dim)
         h1 = self.drop(torch.relu(self.fc1(x)))
         h2 = self.drop(torch.relu(self.fc2(h1)))
-        return self.fc3(h2)
+        return self.fc3(h2) # Return logits
 
 
 # Agent Model 2
@@ -81,4 +81,4 @@ class AgentM2(BaseAgent):
         h1 = self.drop(self.leaky(self.fc1(x)))
         h2 = self.drop(self.leaky(self.fc2(h1)))
         h3 = self.drop(self.leaky(self.fc3(h2)))
-        return self.fc4(h3)
+        return self.fc4(h3) # Return logits

@@ -51,6 +51,9 @@ for i in range(attempts):
         observation = obs
         steps += 1
 
+        # Delay for visualization
+        cv2.waitKey(1)
+
     # Print the reward
     total_reward += attempt_reward
     ind = str(i+1).rjust(len(str(attempts)))
