@@ -57,11 +57,11 @@ def get_BC_data() -> np.ndarray:
             # assert len(data['state']) == 2, f'State length is not 2: {len(data["state"])}, {file}, {i}, \n{data["state"][0]}'
             if isinstance(data['state'], tuple):
                 Sdata.append(convert_data_state(data['state'][0]))
-                Adata.append(convert_data_action(data['action']))
+                Adata.append(data['action'])
                 Rdata.append(data['reward'])
             else:
                 Sdata.append(convert_data_state(data['state']))
-                Adata.append(convert_data_action(data['action']))
+                Adata.append(data['action'])
                 Rdata.append(data['reward'])
 
     perm = np.random.permutation(len(Sdata))

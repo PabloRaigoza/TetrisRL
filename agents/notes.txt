@@ -1,0 +1,4 @@
+M1_BC10000.dat - 10000 epochs on AgentM1, BCELoss, argmax action selection
+M1_BC20000.dat - 20000 epochs on AgentM1, BCELoss, argmax action selection
+M2_BC10000.dat - 10000 epochs on AgentM2, BCELoss, argmax action selection
+M2_BC20000.dat - 20000 epochs on AgentM2, CE Loss, categorical action selection

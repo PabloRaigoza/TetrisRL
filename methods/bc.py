@@ -1,4 +1,3 @@
-from torch.utils.data import TensorDataset, DataLoader
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import numpy as np
@@ -31,7 +30,7 @@ Sdata, Adata, Rdata = get_BC_data()
 split = int(0.8 * len(Sdata))
 
 Strain, Sval = torch.tensor(Sdata[:split], dtype=torch.float), torch.tensor(Sdata[split:], dtype=torch.float)
-Atrain, Aval = torch.tensor(Adata[:split], dtype=torch.float), torch.tensor(Adata[split:], dtype=torch.float)
+Atrain, Aval = torch.tensor(Adata[:split], dtype=torch.long), torch.tensor(Adata[split:], dtype=torch.long)
 Rtrain, Rval = torch.tensor(Rdata[:split], dtype=torch.long), torch.tensor(Rdata[split:], dtype=torch.long)
 
 
@@ -54,7 +53,7 @@ def train(agent, Strain, Atrain, Sval, Aval, save_path, num_epochs=10, val_freq=
     best_loss = float('inf')
     best_model = None
 
-    loss_fn = torch.nn.BCELoss()
+    loss_fn = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.AdamW(agent.parameters(), lr=0.005)
 
 
@@ -70,7 +69,7 @@ def train(agent, Strain, Atrain, Sval, Aval, save_path, num_epochs=10, val_freq=
         agent.eval()
         preds = agent(Sval)
         validation_loss = loss_fn(preds, Aval)
-        validation_acc = torch.sum(torch.argmax(preds, dim=1) == torch.argmax(Aval, dim=1)) / len(Aval)
+        validation_acc = torch.sum(agent.get_action(Sval) == Aval).float() / len(Aval)
 
         training_losses.append(epoch_loss.item())
         validation_losses.append(validation_loss.item())

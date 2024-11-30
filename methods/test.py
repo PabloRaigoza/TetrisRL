@@ -46,13 +46,10 @@ for i in range(attempts):
         action = agent.get_action(torch.tensor(obs_vector, dtype=torch.float32, device=device))
 
         # Stepping through the environment
-        obs, reward, terminated, truncated, info = env.step(action)
+        obs, reward, terminated, truncated, info = env.step(action.item())
         attempt_reward += reward
         observation = obs
         steps += 1
-
-        # Delay for visualization
-        cv2.waitKey(10)
 
     # Print the reward
     total_reward += attempt_reward

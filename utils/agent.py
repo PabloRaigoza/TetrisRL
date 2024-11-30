@@ -12,7 +12,9 @@ ACTION_DIM = 8
 # Base Agent Model
 class BaseAgent(nn.Module):
     def get_action(self, state: np.ndarray):
-        return torch.argmax(self.forward(state)).item()
+        output = self.forward(state)
+        dist = torch.distributions.Categorical(logits=output)
+        return dist.sample()
 
 
     def load_state(self, state: np.ndarray):
@@ -20,7 +22,7 @@ class BaseAgent(nn.Module):
 
 
     def load_path(self, path):
-        self.load_state_dict(torch.load(path, map_location=self.device))
+        self.load_state_dict(torch.load(path, map_location=self.device, weights_only=True))
 
 
     def save(self, path):
@@ -50,7 +52,7 @@ class AgentM1(BaseAgent):
         x = x.view(-1, self.state_dim)
         h1 = self.drop(torch.relu(self.fc1(x)))
         h2 = self.drop(torch.relu(self.fc2(h1)))
-        return torch.sigmoid(self.fc3(h2))
+        return self.fc3(h2)
 
 
 # Agent Model 2
@@ -79,4 +81,4 @@ class AgentM2(BaseAgent):
         h1 = self.drop(self.leaky(self.fc1(x)))
         h2 = self.drop(self.leaky(self.fc2(h1)))
         h3 = self.drop(self.leaky(self.fc3(h2)))
-        return torch.sigmoid(self.fc4(h3))
+        return self.fc4(h3)
