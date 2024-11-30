@@ -2,6 +2,7 @@ from torch.utils.data import TensorDataset, DataLoader
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import numpy as np
+import argparse
 import torch
 import time
 
@@ -9,11 +10,20 @@ from utils.agent import *
 from utils.convert import get_BC_data
 
 
-# Getting user arguments
-agent_path = input("Path to the agent: ") or None
-save_path = input("Path to save the agent: ") or f"agents/BC{int(time.time())}.dat"
-epochs = int(input("Number of epochs: ") or 10)
-val_freq = 100
+# Getting command line arguments
+parser = argparse.ArgumentParser(description="Train a BC agent")
+parser.add_argument("--agent", type=str, default=None, help="Agent path to load")
+parser.add_argument("--model", type=str, default="AgentM2", help="Agent version to use")
+parser.add_argument("--save", type=str, default=f"agents/BC{int(time.time())}.dat", help="Agent path to save")
+parser.add_argument("--epochs", type=int, default=10, help="Number of epochs to train")
+parser.add_argument("--val_freq", type=int, default=100, help="Frequency to validate")
+
+args = parser.parse_args()
+agent_path = args.agent
+model_class = globals()[args.model]
+save_path = args.save
+epochs = args.epochs
+val_freq = args.val_freq
 
 
 # Getting training data
@@ -33,7 +43,7 @@ Rtrain, Rval = Rtrain.to(device), Rval.to(device)
 
 
 # Setting up agent
-agent = Agent(STATE_DIM, HIDDEN_DIM, ACTION_DIM, device)
+agent = model_class(device)
 if agent_path: agent.load_path(agent_path)
 
 
@@ -45,7 +55,8 @@ def train(agent, Strain, Atrain, Sval, Aval, save_path, num_epochs=10, val_freq=
     best_model = None
 
     loss_fn = torch.nn.BCELoss()
-    optimizer = torch.optim.Adam(agent.parameters(), lr=0.001)
+    optimizer = torch.optim.AdamW(agent.parameters(), lr=0.001)
+
 
     # Training loop across epochs
     for i in range(num_epochs // val_freq):
@@ -76,11 +87,13 @@ def train(agent, Strain, Atrain, Sval, Aval, save_path, num_epochs=10, val_freq=
         validation_acc = str(validation_acc.item()).ljust(20)
         print(f"Epoch {ind} / {num_epochs} - Training Loss: {epoch_loss} - Validation Loss: {validation_loss} - Validation Accuracy: {validation_acc}")
 
+    # Saving model and returning
     if save_path:
         agent.load_state(best_model)
         agent.save(save_path)
 
     return agent, training_losses, validation_losses, validation_accs
+
 
 agent, training_losses, validation_losses, validation_accs = train(agent, Strain, Atrain, Sval, Aval, save_path, num_epochs=epochs, val_freq=val_freq)
 
