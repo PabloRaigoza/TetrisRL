@@ -5,9 +5,9 @@ import os
 from utils.environment import makeBC, MAX_STEPS
 
 # Read data directory
-LOAD_RAND = False
+LOAD_RAND = True
 if LOAD_RAND: file_name = np.random.choice(os.listdir("data/BC"))
-else: file_name = "BC_data_106_627639_1000.npy" # Ran using utils/stats.py to find the best replay
+else: file_name = "BC_data_159_276653_1000.npy" # Ran using utils/stats.py to find the best replay
 
 # Load data
 data = np.load(f"data/BC/{file_name}", allow_pickle=True)

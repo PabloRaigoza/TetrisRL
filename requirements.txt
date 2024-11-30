@@ -1,8 +1,11 @@
-ipykernel
+argparse
 gymnasium
+ipykernel
+matplotlib
 numpy
 opencv-python
 pyautogui
+scipy
 tetris-gymnasium
 torch
-matplotlib
+tqdm
