@@ -94,14 +94,6 @@ class PolicyGradient:
 
 
     def train(self, num_iterations, batch_size, gamma, lr):
-        """Train the policy network using the REINFORCE algorithm
-
-        Args:
-            num_iterations (int): Number of iterations to train the policy network
-            batch_size (int): Number of episodes per batch
-            gamma (float): Discount factor
-            lr (float): Learning rate
-        """
         self.policy.train()
         optimizer = torch.optim.Adam(self.policy.parameters(), lr=lr)
 
