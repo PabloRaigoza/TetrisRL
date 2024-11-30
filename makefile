@@ -21,7 +21,7 @@ stats:
 
 # Training
 bc:
-	venv/bin/python -m methods.bc --epochs 100 --val_freq 10
+	venv/bin/python -m methods.bc --epochs 50000 --val_freq 500
 
 test:
-	venv/bin/python -m methods.test --agent agents/M1_BC20000.dat --model AgentM1 --attempts 10
+	venv/bin/python -m methods.test --agent agents/M2_BC50000.dat --attempts 10
