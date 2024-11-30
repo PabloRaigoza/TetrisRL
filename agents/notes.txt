@@ -2,3 +2,11 @@ M1_BC10000.dat - 10000 epochs on AgentM1, BCELoss, argmax action selection
 M1_BC20000.dat - 20000 epochs on AgentM1, BCELoss, argmax action selection
 M2_BC10000.dat - 10000 epochs on AgentM2, BCELoss, argmax action selection
 M2_BC20000.dat - 20000 epochs on AgentM2, CE Loss, categorical action selection
+
+Current Issues/Work To Do:
+- Tune the architecture or hyperparameters to achieve a better BC performance.
+- Training DAgger agent for at least 100 datasets/epochs.
+- Possibly use another expert policy for BC or DAgger instead of ourselves.
+- Right now REINFORCE dominates any starting policy, figure out how to limit this.
+- REINFORCE achieves 0 training loss quickly, but doesn't get good results.
+- Basic exploration term for REINFORCE is given, but we need to mess with it more.

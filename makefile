@@ -27,4 +27,4 @@ test:
 	venv/bin/python -m methods.test --agent agents/M2_BC10000.dat --attempts 10
 
 reinforce:
-	venv/bin/python -m methods.reinforce --epochs 100 --val_freq 10
+	venv/bin/python -m methods.reinforce --epochs 100 --val_freq 5

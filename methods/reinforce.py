@@ -16,6 +16,7 @@ parser.add_argument("--agent", type=str, default=None, help="Agent path to load"
 parser.add_argument("--model", type=str, default="AgentM2", help="Agent version to use")
 parser.add_argument("--save", type=str, default=f"agents/REINFORCE{int(time.time())}.dat", help="Agent path to save")
 parser.add_argument("--epochs", type=int, default=10, help="Number of epochs to train")
+parser.add_argument("--explore", type=bool, default=False, help="Whether to use exploration")
 parser.add_argument("--val_freq", type=int, default=100, help="Frequency to validate")
 
 args = parser.parse_args()
@@ -23,6 +24,7 @@ agent_path = args.agent
 model_class = globals()[args.model]
 save_path = args.save
 epochs = args.epochs
+explore = args.explore
 val_freq = args.val_freq
 
 
@@ -34,16 +36,17 @@ if agent_path: agent.load_path(agent_path)
 
 # Training agent (from HW4)
 class PolicyGradient:
-    def __init__(self, env, policy, device, val_freq=100):
+    def __init__(self, env, policy, device, val_freq=100, explore=False):
         self.env = env
         self.policy = policy
         self.device = device
         self.val_freq = val_freq
+        self.explore = explore
 
 
     def compute_loss(self, episode, gamma):
         sgen, agen, rgen = zip(*episode)
-        ep_states = torch.tensor(sgen, dtype=torch.float32).to(self.device)
+        ep_states = torch.tensor(np.array(sgen), dtype=torch.float32).to(self.device)
         ep_actions = torch.tensor(agen, dtype=torch.int64).to(self.device)
         ep_rewards = torch.tensor(rgen, dtype=torch.float32).to(self.device)
         length = len(episode)
@@ -56,6 +59,11 @@ class PolicyGradient:
         action_dists = torch.softmax(action_logits, dim=1)
         action_probs = action_dists[torch.arange(length), ep_actions].to(self.device)
         loss = - torch.sum(torch.log(action_probs) * rewards_togo.to(self.device))
+
+        if self.explore:
+            exploration = torch.distributions.Categorical(action_dists).entropy().mean()
+            loss += 0.01 * exploration
+
         return loss
 
 
@@ -142,7 +150,7 @@ class PolicyGradient:
 
 
 reinforce = PolicyGradient(makeBC(), agent, device, val_freq)
-avg_losses, avg_rewards = reinforce.train(epochs, batch_size=10, gamma=1, lr=0.005)
+avg_losses, avg_rewards = reinforce.train(epochs, batch_size=100, gamma=1, lr=0.005)
 
 
 # Graphing losses and rewards
