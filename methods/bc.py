@@ -55,7 +55,7 @@ def train(agent, Strain, Atrain, Sval, Aval, save_path, num_epochs=10, val_freq=
     best_model = None
 
     loss_fn = torch.nn.BCELoss()
-    optimizer = torch.optim.AdamW(agent.parameters(), lr=0.001)
+    optimizer = torch.optim.AdamW(agent.parameters(), lr=0.005)
 
 
     # Training loop across epochs
