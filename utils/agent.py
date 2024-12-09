@@ -4,9 +4,11 @@ import torch
 import os
 
 
-# Constants - (Mask + Board), Holder, Queue
+# Constants - (Mask + Board), Holder, Queue vs 40 Next x 13 Data
 STATE_DIM  = 280
 ACTION_DIM = 8
+WRAPPED_STATE_DIM = 520
+WRAPPED_ACTION_DIM = 40
 
 
 # Base Agent Model
@@ -62,6 +64,35 @@ class AgentM2(BaseAgent):
     def __init__(self, device: any, state_dim: int = STATE_DIM,
                  hidden_dim: int = HIDDEN_DIM, action_dim: int = ACTION_DIM):
         super(AgentM2, self).__init__()
+        self.state_dim  = state_dim
+        self.hidden_dim = hidden_dim
+        self.action_dim = action_dim
+        self.device     = device
+
+        self.fc1  = nn.Linear(state_dim, hidden_dim).to(device)
+        self.fc2  = nn.Linear(hidden_dim, hidden_dim//2).to(device)
+        self.fc3  = nn.Linear(hidden_dim//2, hidden_dim//4).to(device)
+        self.fc4  = nn.Linear(hidden_dim//4, action_dim).to(device)
+
+        self.leaky = nn.LeakyReLU().to(device)
+        self.drop = nn.Dropout().to(device)
+
+
+    def forward(self, x: np.ndarray):
+        x = x.view(-1, self.state_dim)
+        h1 = self.drop(self.leaky(self.fc1(x)))
+        h2 = self.drop(self.leaky(self.fc2(h1)))
+        h3 = self.drop(self.leaky(self.fc3(h2)))
+        return self.fc4(h3) # Return logits
+
+
+# Agent Model 3
+class AgentM3(BaseAgent):
+    HIDDEN_DIM = 400
+
+    def __init__(self, device: any, state_dim: int = WRAPPED_STATE_DIM,
+                 hidden_dim: int = HIDDEN_DIM, action_dim: int = WRAPPED_ACTION_DIM):
+        super(AgentM3, self).__init__()
         self.state_dim  = state_dim
         self.hidden_dim = hidden_dim
         self.action_dim = action_dim

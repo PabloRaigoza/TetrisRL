@@ -6,7 +6,7 @@ import os
 
 def find_demonstration_max_total_reward():
     # Read data directory
-    data_dir = "data/BC"
+    data_dir = "data/oldBC"
 
     # Search for replay with higest total reward
     max_reward = -np.inf
@@ -23,7 +23,7 @@ def find_demonstration_max_total_reward():
 
 def plot_demonstrations():
     # Read data directory
-    data_dir = "data/BC"
+    data_dir = "data/oldBC"
 
     # Get the total rewards
     total_rewards = []
@@ -47,7 +47,7 @@ def plot_demonstrations():
     plt.legend()
 
     os.makedirs("stats", exist_ok=True)
-    plt.savefig("stats/BC_rewards.png", dpi=300)
+    plt.savefig("stats/oldBC_rewards.png", dpi=300)
 
     def gaussian(x, a, b, c):
         return a * np.exp(-b * (x - c)**2)
@@ -81,12 +81,12 @@ def plot_demonstrations():
     plt.ylabel("Frequency")
 
     os.makedirs("stats", exist_ok=True)
-    plt.savefig("stats/BC_rewards_dist.png", dpi=300)
+    plt.savefig("stats/oldBC_rewards_dist.png", dpi=300)
 
 
 def pearson_correlation():
     # Read data directory
-    data_dir = "data/BC"
+    data_dir = "data/oldBC"
 
     # Get the total rewards
     total_rewards = []

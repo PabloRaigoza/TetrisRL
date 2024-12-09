@@ -2,11 +2,11 @@ import numpy as np
 import cv2
 import os
 
-from utils.environment import makeBC, MAX_STEPS
+from utils.environment import makeStandard, MAX_STEPS
 
 
 # Create data directory
-data_dir = "data/BC"
+data_dir = "data/OldBC"
 os.makedirs(data_dir, exist_ok=True)
 
 
@@ -17,7 +17,7 @@ file_name = f"BC_data_{str(num).zfill(3)}_{str(seed).zfill(6)}_{MAX_STEPS}.npy"
 
 
 # Create an instance of Tetris
-env = makeBC()
+env = makeStandard()
 observation = env.reset(seed=seed)
 
 

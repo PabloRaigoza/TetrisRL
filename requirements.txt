@@ -1,4 +1,5 @@
 argparse
+opencv-python
 gymnasium
 ipykernel
 matplotlib
