@@ -14,3 +14,5 @@ Current Issues/Work To Do:
 
 - Maybe give more importance to the last move that gives a reward.
 - Change the reward function to incentivize survival and line clears.
+
+https://cs231n.stanford.edu/reports/2016/pdfs/121_Report.pdf

@@ -18,6 +18,8 @@ replay:
 stats:
 	venv/bin/python -m data.stats
 
+ai_play:
+	venv/bin/python -m data.ai_play
 
 # Training
 bc:
