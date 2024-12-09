@@ -14,3 +14,17 @@ Current Issues/Work To Do:
 
 - Maybe give more importance to the last move that gives a reward.
 - Change the reward function to incentivize survival and line clears.
+
+
+Reserach Online Models
+- I found three online models that had various implementations of good Tetris bots
+- 
+
+- We realized that reinforce was varrying widly from the intial starting conditition of BC
+- In order to fix this, we decided to start with our BC model, then have REINFORCE perform the exploration
+- We will allow reinforce to learn a little, then we'll average our the parameters of the model to create a new model
+- We will start learning again with this model, and continue. This will force the model to be similar to BC
+
+1. Reinfroce dominated
+2. Tried, fixed it using averaging technique 
+3. 

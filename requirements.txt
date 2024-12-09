@@ -9,3 +9,9 @@ scipy
 tetris-gymnasium
 torch
 tqdm
+
+tyro
+stable-baselines3[extra]
+wandb
+moviepy
+PyExecJS

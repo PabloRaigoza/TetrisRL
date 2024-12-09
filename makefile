@@ -12,6 +12,12 @@ clean:
 collect:
 	venv/bin/python -m data.collect
 
+ai:
+	venv/bin/python -m data.ai
+
+retry_ai:
+	venv/bin/python -m data.ai_retry
+
 replay:
 	venv/bin/python -m data.replay
 
