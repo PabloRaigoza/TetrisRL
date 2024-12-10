@@ -17,7 +17,3 @@ index = int(sys.argv[2])
 # Printing the data
 data = np.load(path, allow_pickle=True)
 pprint(data[index])
-
-
-# from utils.convert import convert_data_state
-# pprint(convert_data_state(data[index]['state']))

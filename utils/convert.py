@@ -66,7 +66,7 @@ def get_unwrapped_BC_data() -> np.ndarray:
 
 # Functions to convert data dictionary to wrapped state
 def convert_wrapped_state(data: dict) -> np.ndarray:
-    return None
+    return np.flatten(data)
 
 
 def get_wrapped_BC_data() -> np.ndarray:
