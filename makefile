@@ -12,6 +12,9 @@ clean:
 collect:
 	venv/bin/python -m data.collect
 
+expert:
+	venv/bin/python -m data.expert_bc --attempts 98
+
 replay:
 	venv/bin/python -m data.replay
 
