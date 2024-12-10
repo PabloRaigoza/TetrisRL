@@ -9,7 +9,11 @@ We got an online expert to train BC on, realized that it used different features
 than just the board, so we modified our agent to use similar features. This should
 achieve a better BC result. Note that we had to go into library source code in
 order to achieve the changes that we wanted. The environment was modified in such
-a way that pieces wouldn't be put on the leftmost column, so we have to fix that
+a way that pieces wouldn't be put on the leftmost column, so we have to fix that.
+
+We were also planning on filtering the data collected by the expert to only keep
+the trajectories that have 1000 steps (kind of the best ones). But then again it
+might be better to keep all the data so the agent can learn to recover I guess?
 
 Current Issues/Work To Do:
 - Training DAgger agent for at least 10 datasets.
