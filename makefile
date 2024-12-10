@@ -21,6 +21,9 @@ stats:
 ai_play:
 	venv/bin/python -m data.ai_play
 
+ai_again:
+	venv/bin/python -m data.ai_again
+
 # Training
 bc:
 	venv/bin/python -m methods.bc --epochs 10000 --val_freq 100

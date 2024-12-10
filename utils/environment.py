@@ -31,7 +31,7 @@ def makeDA():
         "tetris_gymnasium/Tetris",
         render_mode="human",
         render_upscale=40,
-        rewards_mapping=rewards_mapping
+        rewards_mapping=rewards_mapping,
     )
 
 import copy
@@ -204,6 +204,6 @@ def makeGroupedActionsWrapper():
     # )
     groupedActionsWrapper = GroupedActionsObservations(
         env=env,
-        observation_wrappers=[FeatureVectorObservation(env)]
+        # observation_wrappers=[FeatureVectorObservation(env)]
     )
     return groupedActionsWrapper
