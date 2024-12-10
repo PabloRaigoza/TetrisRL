@@ -128,3 +128,32 @@ class AgentM3(BaseAgent):
         h2 = self.drop(self.leaky(self.fc2(h1)))
         h3 = self.drop(self.leaky(self.fc3(h2)))
         return self.fc4(h3) # Return logits
+
+
+# Agent Model 4
+class AgentM4(BaseAgent):
+    HIDDEN_DIM = 450
+
+    def __init__(self, device: any, state_dim: int = WRAPPED_STATE_DIM,
+                 hidden_dim: int = HIDDEN_DIM, action_dim: int = WRAPPED_ACTION_DIM):
+        super(AgentM3, self).__init__()
+        self.state_dim  = state_dim
+        self.hidden_dim = hidden_dim
+        self.action_dim = action_dim
+        self.device     = device
+
+        self.fc1  = nn.Linear(state_dim, hidden_dim).to(device)
+        self.fc2  = nn.Linear(hidden_dim, hidden_dim*2//3).to(device)
+        self.fc3  = nn.Linear(hidden_dim*2//3, hidden_dim//3).to(device)
+        self.fc4  = nn.Linear(hidden_dim//3, action_dim).to(device)
+
+        self.leaky = nn.LeakyReLU().to(device)
+        self.drop = nn.Dropout(p=0.35).to(device)
+
+
+    def forward(self, x: np.ndarray):
+        x = x.view(-1, self.state_dim)
+        h1 = self.drop(self.leaky(self.fc1(x)))
+        h2 = self.drop(self.leaky(self.fc2(h1)))
+        h3 = self.drop(self.leaky(self.fc3(h2)))
+        return self.fc4(h3) # Return logits

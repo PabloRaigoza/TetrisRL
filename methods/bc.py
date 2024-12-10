@@ -12,7 +12,7 @@ from utils.convert import get_unwrapped_BC_data, get_wrapped_BC_data
 # Getting command line arguments
 parser = argparse.ArgumentParser(description="Train a BC agent")
 parser.add_argument("--agent", type=str, default=None, help="Agent path to load")
-parser.add_argument("--model", type=str, default="AgentM3", help="Agent version to use")
+parser.add_argument("--model", type=str, default="AgentM4", help="Agent version to use")
 parser.add_argument("--grouped", type=bool, default=False, help="Whether to use wrapped environment")
 parser.add_argument("--save", type=str, default=f"agents/BC{int(time.time())}.dat", help="Agent path to save")
 parser.add_argument("--epochs", type=int, default=10, help="Number of epochs to train")

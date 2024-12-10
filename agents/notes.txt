@@ -1,9 +1,19 @@
+# Unwrapped
 M1_BC10000.dat - 10000 epochs on AgentM1, BCELoss, argmax action selection
 M1_BC20000.dat - 20000 epochs on AgentM1, BCELoss, argmax action selection
 M2_BC10000.dat - 10000 epochs on AgentM2, BCELoss, argmax action selection
 M2_BC20000.dat - 20000 epochs on AgentM2, CE Loss, categorical action selection
+
+# Wrapped
 M3_BC10000.dat - 10000 epochs on AgentM3, CE Loss, categorical action selection
 M3_BC20000.dat - 20000 epochs on AgentM3, CE Loss, categorical action selection
+M3_BC50000.dat - 50000 epochs on AgentM3, CE Loss, categorical action selection
+
+# Things to train (these filtered data)
+M4_BC25000.dat - 25000 epochs on AgentM4, CE Loss, random init
+M4_1DA25000.dat - 25000 epochs on AgentM4, CE Loss, random init with no BC data
+M4_2DA25000.dat - 25000 epochs on AgentM4, CE Loss, BC init with no BC data
+M4_3DA25000.dat - 25000 epochs on AgentM4, CE Loss, BC init with BC data
 
 We got an online expert to train BC on, realized that it used different features
 than just the board, so we modified our agent to use similar features. This should
@@ -12,13 +22,11 @@ order to achieve the changes that we wanted. The environment was modified in suc
 a way that pieces wouldn't be put on the leftmost column, so we have to fix that.
 
 We were also planning on filtering the data collected by the expert to only keep
-the trajectories that have 1000 steps (kind of the best ones). But then again it
+the trajectories that have >= 750 steps (kind of the best ones). But then again it
 might be better to keep all the data so the agent can learn to recover I guess?
 
 Current Issues/Work To Do:
-- Training DAgger agent for at least 10 datasets.
 - Add more heuristics than just the 4 that the expert uses.
-
 - Right now REINFORCE dominates any starting policy, figure out how to limit this.
 - REINFORCE achieves 0 training loss quickly, but doesn't get good results.
 - Basic exploration term for REINFORCE is given, but we need to mess with it more.
