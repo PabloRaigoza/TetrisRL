@@ -6,27 +6,24 @@ import torch
 import time
 
 from utils.agent import *
-from utils.convert import get_BC_data
+from utils.convert import get_unwrapped_BC_data, get_wrapped_BC_data
 
 
 # Getting command line arguments
 parser = argparse.ArgumentParser(description="Train a BC agent")
 parser.add_argument("--agent", type=str, default=None, help="Agent path to load")
-parser.add_argument("--model", type=str, default="AgentM2", help="Agent version to use")
+parser.add_argument("--model", type=str, default="AgentM3", help="Agent version to use")
+parser.add_argument("--grouped", type=bool, default=False, help="Whether to use wrapped environment")
 parser.add_argument("--save", type=str, default=f"agents/BC{int(time.time())}.dat", help="Agent path to save")
 parser.add_argument("--epochs", type=int, default=10, help="Number of epochs to train")
 parser.add_argument("--val_freq", type=int, default=100, help="Frequency to validate")
 
 args = parser.parse_args()
-agent_path = args.agent
 model_class = globals()[args.model]
-save_path = args.save
-epochs = args.epochs
-val_freq = args.val_freq
 
 
 # Getting training data
-Sdata, Adata, _ = get_BC_data()
+Sdata, Adata = get_wrapped_BC_data() if args.grouped else get_unwrapped_BC_data()
 split = int(0.8 * len(Sdata))
 
 Strain, Sval = torch.tensor(Sdata[:split], dtype=torch.float), torch.tensor(Sdata[split:], dtype=torch.float)
@@ -39,7 +36,7 @@ Atrain, Aval = Atrain.to(device), Aval.to(device)
 
 # Setting up agent
 agent = model_class(device)
-if agent_path: agent.load_path(agent_path)
+if args.agent: agent.load_path(args.agent)
 
 
 # Training agent (from HW2)
@@ -90,18 +87,19 @@ def train(agent, Strain, Atrain, Sval, Aval, save_path, num_epochs=10, val_freq=
     return agent, training_losses, validation_losses, validation_accs
 
 
-agent, training_losses, validation_losses, validation_accs = train(agent, Strain, Atrain, Sval, Aval, save_path, num_epochs=epochs, val_freq=val_freq)
+agent, training_losses, validation_losses, validation_accs = \
+    train(agent, Strain, Atrain, Sval, Aval, args.save, num_epochs=args.epochs, val_freq=args.val_freq)
 
 
 # Graphing validation loss
-plt.plot(np.arange(0, epochs, val_freq), training_losses, label="Training Loss", color="red")
-plt.plot(np.arange(0, epochs, val_freq), validation_losses, label="Validation Loss", color="green")
-plt.plot(np.arange(0, epochs, val_freq), validation_accs, label="Validation Accuracy", color="blue")
+plt.plot(np.arange(0, args.epochs, args.val_freq), training_losses, label="Training Loss", color="red")
+plt.plot(np.arange(0, args.epochs, args.val_freq), validation_losses, label="Validation Loss", color="green")
+plt.plot(np.arange(0, args.epochs, args.val_freq), validation_accs, label="Validation Accuracy", color="blue")
 
 plt.title("Training Over Epochs")
 plt.xlabel("Epoch")
 plt.legend()
 
-stat_path = f"stats/{save_path.split('/')[-1][:-4]}_loss.png"
+stat_path = f"stats/{args.save.split('/')[-1][:-4]}_loss.png"
 os.makedirs(os.path.dirname(stat_path), exist_ok=True)
 plt.savefig(stat_path)

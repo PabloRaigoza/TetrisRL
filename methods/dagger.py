@@ -7,28 +7,24 @@ import cv2
 import os
 
 from utils.agent import *
-from utils.convert import get_DA_data, convert_data_state
-from utils.environment import makeDA, MAX_STEPS
+from utils.convert import get_wrapped_DA_data, convert_wrapped_state
+from utils.environment import makeGrouped, MAX_STEPS
 
 
 # Getting command line arguments
 parser = argparse.ArgumentParser(description="Train a DAgger agent")
 parser.add_argument("--agent", type=str, default=None, help="Agent path to load")
-parser.add_argument("--model", type=str, default="AgentM2", help="Agent version to use")
+parser.add_argument("--model", type=str, default="AgentM3", help="Agent version to use")
 parser.add_argument("--save", type=str, default=f"agents/DA{int(time.time())}.dat", help="Agent path to save")
 parser.add_argument("--epochs", type=int, default=10, help="Number of epochs to train")
 parser.add_argument("--val_freq", type=int, default=100, help="Frequency to validate")
 
 args = parser.parse_args()
-agent_path = args.agent
 model_class = globals()[args.model]
-save_path = args.save
-epochs = args.epochs
-val_freq = args.val_freq
 
 
 # Getting training data
-Sdata, _, Edata = get_DA_data()
+Sdata, Edata = get_wrapped_DA_data()
 split = int(0.8 * len(Sdata))
 
 Strain, Sval = torch.tensor(Sdata[:split], dtype=torch.float), torch.tensor(Sdata[split:], dtype=torch.float)
@@ -40,8 +36,9 @@ Etrain, Eval = Etrain.to(device), Eval.to(device)
 
 
 # Setting up agent
+expert = ExpertAgent(device)
 agent = model_class(device)
-if agent_path: agent.load_path(agent_path)
+if args.agent: agent.load_path(args.agent)
 
 
 # Function for collecting expert data
@@ -56,9 +53,9 @@ def collect_expert_data(agent, Strain, Sval, Etrain, Eval):
     file_name = f"DA_data_{str(num).zfill(3)}_{str(seed).zfill(6)}_{MAX_STEPS}.npy"
 
     # Create an instance of Tetris
-    env = makeDA()
+    env = makeGrouped()
     observation = env.reset(seed=seed)
-    NSdata, NAdata, NEdata = [], [], []
+    NSdata, NEdata = [], []
 
     # Initialize data array of MAX_STEPS
     data = np.array([{} for _ in range(MAX_STEPS)])
@@ -73,29 +70,19 @@ def collect_expert_data(agent, Strain, Sval, Etrain, Eval):
         print("Step", steps)
 
         # Get state and action from agent
-        obs_vector = convert_data_state(observation[0]) \
+        obs_vector = convert_wrapped_state(observation[0]) \
                 if isinstance(observation, tuple) \
-                else convert_data_state(observation)
+                else convert_wrapped_state(observation)
         action = agent.get_action(torch.tensor(obs_vector, dtype=torch.float32, device=device))
 
         # Get expert action from user input and update the state
-        expert_action = None
-        while expert_action is None:
-            key = cv2.waitKey(1)
-            if key == ord("a"):   expert_action = env.unwrapped.actions.move_left
-            elif key == ord("d"): expert_action = env.unwrapped.actions.move_right
-            elif key == ord("s"): expert_action = env.unwrapped.actions.move_down
-            elif key == ord(";"): expert_action = env.unwrapped.actions.rotate_counterclockwise
-            elif key == ord("'"): expert_action = env.unwrapped.actions.rotate_clockwise
-            elif key == ord(" "): expert_action = env.unwrapped.actions.hard_drop
-            elif key == ord("c"): expert_action = env.unwrapped.actions.swap
-            elif key == ord("t"): expert_action = env.unwrapped.actions.no_op
+        expert_action = expert.get_action(obs_vector)
         obs, reward, terminated, truncated, info = env.step(action.item())
 
         # Save the observation and append data
         data[steps] = {
             'state': observation,
-            'action': action.item(),
+            'action': action,
             'expert_action': expert_action,
             'reward': reward,
             'terminated': terminated,
@@ -179,4 +166,5 @@ def train(agent, Strain, Etrain, Sval, Eval, save_path, num_epochs=10, val_freq=
     return agent, training_losses, validation_losses, validation_accs
 
 
-agent, training_losses, validation_losses, validation_accs = train(agent, Strain, Etrain, Sval, Eval, save_path, num_epochs=epochs, val_freq=val_freq)
+agent, training_losses, validation_losses, validation_accs = \
+    train(agent, Strain, Etrain, Sval, Eval, args.save, num_epochs=args.epochs, val_freq=args.val_freq)

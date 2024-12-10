@@ -6,32 +6,27 @@ import torch
 import time
 
 from utils.agent import *
-from utils.convert import convert_data_state
-from utils.environment import makeBC, MAX_STEPS
+from utils.convert import convert_unwrapped_state, convert_wrapped_state
+from utils.environment import makeStandard, makeGrouped, MAX_STEPS
 
 
 # Getting command line arguments
 parser = argparse.ArgumentParser(description="Train a BC agent")
 parser.add_argument("--agent", type=str, default=None, help="Agent path to load")
-parser.add_argument("--model", type=str, default="AgentM2", help="Agent version to use")
+parser.add_argument("--model", type=str, default="AgentM3", help="Agent version to use")
+parser.add_argument("--grouped", type=bool, default=False, help="Whether to use wrapped environment")
 parser.add_argument("--save", type=str, default=f"agents/REINFORCE{int(time.time())}.dat", help="Agent path to save")
 parser.add_argument("--epochs", type=int, default=10, help="Number of epochs to train")
-parser.add_argument("--explore", type=bool, default=False, help="Whether to use exploration")
 parser.add_argument("--val_freq", type=int, default=100, help="Frequency to validate")
 
 args = parser.parse_args()
-agent_path = args.agent
 model_class = globals()[args.model]
-save_path = args.save
-epochs = args.epochs
-explore = args.explore
-val_freq = args.val_freq
 
 
 # Setting up agent
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 agent = model_class(device)
-if agent_path: agent.load_path(agent_path)
+if args.agent: agent.load_path(args.agent)
 
 
 # Training agent (from HW4)
@@ -76,15 +71,14 @@ class PolicyGradient:
 
 
     def run_episode(self):
+        convert_state = convert_wrapped_state if args.grouped else convert_unwrapped_state
         seed = np.random.randint(0, 1000000)
         state = self.env.reset(seed=seed)
         episode = []
         terminated = False
 
         while not terminated and len(episode) < MAX_STEPS:
-            obs_vector = convert_data_state(state[0]) \
-                if isinstance(state, tuple) \
-                else convert_data_state(state)
+            obs_vector = convert_state(state[0]) if isinstance(state, tuple) else convert_state(state)
             action = self.policy.get_action(torch.tensor(obs_vector, dtype=torch.float32, device=self.device))
 
             next_state, reward, terminated, _, _ = self.env.step(action.item())
@@ -119,9 +113,9 @@ class PolicyGradient:
                 avg_reward = str(avg_reward).ljust(20)
                 print(f"Epoch {ind} / {num_iterations} - Training Loss: {avg_loss} - Validation Reward {avg_reward}")
 
-        if save_path:
+        if args.save:
             agent.load_state(best_model)
-            agent.save(save_path)
+            agent.save(args.save)
 
         return avg_losses, avg_rewards
 
@@ -141,18 +135,19 @@ class PolicyGradient:
         return (total_reward / num_episodes).item()
 
 
-reinforce = PolicyGradient(makeBC(), agent, device, val_freq)
-avg_losses, avg_rewards = reinforce.train(epochs, batch_size=100, gamma=1, lr=0.005)
+env = makeGrouped() if args.grouped else makeStandard()
+reinforce = PolicyGradient(env, agent, device, args.val_freq)
+avg_losses, avg_rewards = reinforce.train(args.epochs, batch_size=100, gamma=1, lr=0.005)
 
 
 # Graphing losses and rewards
-plt.plot(np.arange(0, epochs, val_freq), avg_losses, label="Training Loss", color="red")
-plt.plot(np.arange(0, epochs, val_freq), avg_rewards, label="Validation Reward", color="blue")
+plt.plot(np.arange(0, args.epochs, args.val_freq), avg_losses, label="Training Loss", color="red")
+plt.plot(np.arange(0, args.epochs, args.val_freq), avg_rewards, label="Validation Reward", color="blue")
 
 plt.title("Training Over Epochs")
 plt.xlabel("Epoch")
 plt.legend()
 
-stat_path = f"stats/{save_path.split('/')[-1][:-4]}_loss.png"
+stat_path = f"stats/{args.save.split('/')[-1][:-4]}_loss.png"
 os.makedirs(os.path.dirname(stat_path), exist_ok=True)
 plt.savefig(stat_path)

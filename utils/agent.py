@@ -32,6 +32,23 @@ class BaseAgent(nn.Module):
         torch.save(self.state_dict(), path)
 
 
+# Expert Agent Model
+class ExpertAgent(BaseAgent):
+    def __init__(self, device: any, state_dim: int = WRAPPED_STATE_DIM, action_dim: int = WRAPPED_ACTION_DIM):
+        super(AgentM3, self).__init__()
+        self.state_dim  = state_dim
+        self.action_dim = action_dim
+        self.device = device
+
+        self.weights = [-0.510066, 0.760666, -0.35663, -0.184483, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        self.weights = torch.tensor(self.weights, dtype=torch.float).to(device)
+
+
+    def get_action(self, state: np.ndarray):
+        state = state.view(-1, len(self.weights))
+        return np.argmax(np.dot(state, self.weights))
+
+
 # Agent Model 1
 class AgentM1(BaseAgent):
     HIDDEN_DIM = 140

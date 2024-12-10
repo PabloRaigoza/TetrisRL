@@ -1,8 +1,6 @@
 import numpy as np
 import os
 
-from utils.agent import ACTION_DIM
-
 
 # Function to convert data dictionary to unwrapped state
 def convert_mask(mask: np.ndarray) -> np.ndarray:
@@ -40,19 +38,13 @@ def convert_unwrapped_state(data: dict) -> np.ndarray:
     return total / np.linalg.norm(total)
 
 
-def convert_unwrapped_action(data: int) -> np.ndarray:
-    action = np.zeros(ACTION_DIM)
-    action[data] = 1
-    return action
-
-
 def get_unwrapped_BC_data() -> np.ndarray:
     path = 'data/oldBC'
-    Sdata, Adata, Rdata = [], [], []
+    Sdata, Adata = [], []
     print(f'Loading data from {path}...')
 
     if not os.path.exists(path):
-        return np.array(Sdata), np.array(Adata), np.array(Rdata)
+        return np.array(Sdata), np.array(Adata)
 
     # Iterate through all files in the directory
     for file in os.listdir(path):
@@ -62,17 +54,14 @@ def get_unwrapped_BC_data() -> np.ndarray:
             if isinstance(data['state'], tuple):
                 Sdata.append(convert_unwrapped_state(data['state'][0]))
                 Adata.append(data['action'])
-                Rdata.append(data['reward'])
             else:
                 Sdata.append(convert_unwrapped_state(data['state']))
                 Adata.append(data['action'])
-                Rdata.append(data['reward'])
 
     perm = np.random.permutation(len(Sdata))
     Sdata = np.array(Sdata)[perm]
     Adata = np.array(Adata)[perm]
-    Rdata = np.array(Rdata)[perm]
-    return Sdata, Adata, Rdata
+    return Sdata, Adata
 
 
 # Functions to convert data dictionary to wrapped state
@@ -82,11 +71,11 @@ def convert_wrapped_state(data: dict) -> np.ndarray:
 
 def get_wrapped_BC_data() -> np.ndarray:
     path = 'data/BC'
-    Sdata, Adata, Rdata = [], [], []
+    Sdata, Adata = [], []
     print(f'Loading data from {path}...')
 
     if not os.path.exists(path):
-        return np.array(Sdata), np.array(Adata), np.array(Rdata)
+        return np.array(Sdata), np.array(Adata)
 
     # Iterate through all files in the directory
     for file in os.listdir(path):
@@ -96,26 +85,23 @@ def get_wrapped_BC_data() -> np.ndarray:
             if isinstance(data['state'], tuple):
                 Sdata.append(convert_wrapped_state(data['state'][0]))
                 Adata.append(data['action'])
-                Rdata.append(data['reward'])
             else:
                 Sdata.append(convert_wrapped_state(data['state']))
                 Adata.append(data['action'])
-                Rdata.append(data['reward'])
 
     perm = np.random.permutation(len(Sdata))
     Sdata = np.array(Sdata)[perm]
     Adata = np.array(Adata)[perm]
-    Rdata = np.array(Rdata)[perm]
-    return Sdata, Adata, Rdata
+    return Sdata, Adata
 
 
 def get_wrapped_DA_data() -> np.ndarray:
     path = 'data/DA'
-    Sdata, Adata, Edata = [], [], []
+    Sdata, Edata = [], []
     print(f'Loading data from {path}...')
 
     if not os.path.exists(path):
-        return np.array(Sdata), np.array(Adata), np.array(Edata)
+        return np.array(Sdata), np.array(Edata)
 
     # Iterate through all files in the directory
     for file in os.listdir(path):
@@ -124,15 +110,12 @@ def get_wrapped_DA_data() -> np.ndarray:
         for i, data in enumerate(file_data):
             if isinstance(data['state'], tuple):
                 Sdata.append(convert_wrapped_state(data['state'][0]))
-                Adata.append(data['action'])
                 Edata.append(data['expert_action'])
             else:
                 Sdata.append(convert_wrapped_state(data['state']))
-                Adata.append(data['action'])
                 Edata.append(data['expert_action'])
 
     perm = np.random.permutation(len(Sdata))
     Sdata = np.array(Sdata)[perm]
-    Adata = np.array(Adata)[perm]
     Edata = np.array(Edata)[perm]
-    return Sdata, Adata, Edata
+    return Sdata, Edata
