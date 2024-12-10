@@ -59,6 +59,8 @@ for i in range(args.attempts):
     reward = str(attempt_reward).rjust(5)
     print(f"Attempt: {ind} / {args.attempts}, Seed: {seed}, Reward: {reward}")
 
+    cv2.waitKey(10)
+
     # Close the environment
     env.close()
     cv2.destroyAllWindows()
