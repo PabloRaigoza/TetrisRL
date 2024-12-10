@@ -15,11 +15,11 @@ args = parser.parse_args()
 data_dir = "data/BC"
 os.makedirs(data_dir, exist_ok=True)
 
-for i in tqdm(range(args.attempts), desc="Collecting data"):
+def collect_data(i, base):
     # Create data file name
-    num = len(os.listdir(data_dir))
+    num = i
     seed = np.random.randint(0, 1000000)
-    file_name = f"BC_data_{str(num).zfill(3)}_{str(seed).zfill(6)}_{MAX_STEPS}.npy"
+    file_name = f"BC_data_{str(num+base).zfill(3)}_{str(seed).zfill(6)}_{MAX_STEPS}.npy"
 
 
     # Create an instance of Tetris
@@ -37,7 +37,7 @@ for i in tqdm(range(args.attempts), desc="Collecting data"):
     # Collect data loop
     while not terminated and steps < MAX_STEPS:
         # Render the current state of the game
-        env.render()
+        # env.render()
 
         action = expert.get_action(observation[0], observation[1]["action_mask"])
         obs, reward, terminated, truncated, info = env.step(action)
@@ -64,6 +64,12 @@ for i in tqdm(range(args.attempts), desc="Collecting data"):
 
 
     # Close the environment
-    print(f"Data saved to {os.path.join(data_dir, file_name)}")
+    print(f"Data saved to {os.path.join(data_dir, file_name)} - Steps: {steps}")
     env.close()
     cv2.destroyAllWindows()
+
+# Collect data with multiprocessing
+from multiprocessing import Pool
+
+with Pool(4) as p:
+    p.starmap(collect_data, [(i, 0) for i in range(args.attempts)])

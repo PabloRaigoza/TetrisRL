@@ -293,7 +293,13 @@ class FeatureVectorObservationCopy(FeatureVectorObservation):
         return features
 
 def makeGroupedActionsWrapper():
-    env=makeDA()
+    env=gym.make(
+        "tetris_gymnasium/Tetris",
+        # render_mode="human",
+        render_upscale=40,
+        rewards_mapping=rewards_mapping
+    )
+
     groupedActionsWrapper = GroupedActionsObservationsCopy(
         env=env,
         observation_wrappers=[FeatureVectorObservationCopy(env)]
