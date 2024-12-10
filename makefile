@@ -24,7 +24,7 @@ stats:
 
 # Training
 bc:
-	venv/bin/python -m methods.bc --model AgentM3 --grouped true --epochs 10000 --val_freq 100
+	venv/bin/python -m methods.bc --model AgentM3 --grouped true --agent agents/M3_BC10000.dat --epochs 10000 --val_freq 100
 
 dagger:
 	venv/bin/python -m methods.dagger --epochs 500 --val_freq 100

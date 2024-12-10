@@ -98,7 +98,7 @@ def collect_expert_data(agent, Strain, Sval, Etrain, Eval):
 
         # Update the observation
         print(f"Step {steps + 1}/{MAX_STEPS} - Reward: {reward}", end="\r")
-        observation = obs
+        observation = obs, info
         steps += 1
 
 

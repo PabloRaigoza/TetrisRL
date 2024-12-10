@@ -109,6 +109,7 @@ def get_wrapped_DA_data() -> np.ndarray:
         file_data = np.load(f'{path}/{file}', allow_pickle=True)
 
         for i, data in enumerate(file_data):
+            if len(data) == 0: continue
             if isinstance(data['state'], tuple):
                 Sdata.append(convert_wrapped_state(data['state'][0]))
                 Edata.append(data['expert_action'])
