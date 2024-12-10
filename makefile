@@ -27,10 +27,10 @@ bc:
 	venv/bin/python -m methods.bc --model AgentM3 --grouped true --agent agents/M3_BC20000.dat --epochs 30000 --val_freq 100
 
 dagger:
-	venv/bin/python -m methods.dagger --epochs 500 --val_freq 100
+	venv/bin/python -m methods.dagger --epochs 5000 --val_freq 100
 
 reinforce:
 	venv/bin/python -m methods.reinforce --model AgentM2 --epochs 100 --val_freq 5
 
 test:
-	venv/bin/python -m methods.test --agent agents/M3_BC20000.dat --grouped true --model AgentM3 --attempts 10
+	venv/bin/python -m methods.test --grouped true --agent agents/DA1733843774.dat --model AgentM3 --attempts 10

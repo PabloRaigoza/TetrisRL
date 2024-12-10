@@ -80,9 +80,10 @@ def get_wrapped_BC_data() -> np.ndarray:
     # Iterate through all files in the directory
     for file in os.listdir(path):
         file_data = np.load(f'{path}/{file}', allow_pickle=True)
+        not_empty = [data for data in file_data if len(data) > 0]
+        if (len(not_empty) < 500): continue
 
-        for data in file_data:
-            if len(data) == 0: continue
+        for data in not_empty:
             if isinstance(data['state'], tuple):
                 Sdata.append(convert_wrapped_state(data['state'][0]))
                 Adata.append(data['action'])

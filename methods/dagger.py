@@ -14,7 +14,7 @@ from utils.environment import makeGrouped, MAX_STEPS
 # Getting command line arguments
 parser = argparse.ArgumentParser(description="Train a DAgger agent")
 parser.add_argument("--agent", type=str, default=None, help="Agent path to load")
-parser.add_argument("--model", type=str, default="AgentM3", help="Agent version to use")
+parser.add_argument("--model", type=str, default="AgentM4", help="Agent version to use")
 parser.add_argument("--save", type=str, default=f"agents/DA{int(time.time())}.dat", help="Agent path to save")
 parser.add_argument("--epochs", type=int, default=10, help="Number of epochs to train")
 parser.add_argument("--val_freq", type=int, default=100, help="Frequency to validate")
@@ -66,8 +66,7 @@ def collect_expert_data(agent, Strain, Sval, Etrain, Eval):
     # Collect data loop
     while not terminated and steps < MAX_STEPS:
         # Render the current state of the game
-        env.render()
-        print("Step", steps)
+        # env.render()
 
         # Get state and action from agent
         obs_vector = convert_wrapped_state(observation[0]) \
@@ -76,7 +75,7 @@ def collect_expert_data(agent, Strain, Sval, Etrain, Eval):
         action = agent.get_action(torch.tensor(obs_vector, dtype=torch.float32, device=device))
 
         # Get expert action from user input and update the state
-        expert_action = expert.get_action(obs_vector)
+        expert_action = expert.get_action(obs_vector, observation[1]['action_mask'])
         obs, reward, terminated, truncated, info = env.step(action.item())
 
         # Save the observation and append data
@@ -97,13 +96,12 @@ def collect_expert_data(agent, Strain, Sval, Etrain, Eval):
             np.save(f, data)
 
         # Update the observation
-        print(f"Step {steps + 1}/{MAX_STEPS} - Reward: {reward}", end="\r")
         observation = obs, info
         steps += 1
+        cv2.waitKey(1)
 
 
     # Close the environment
-    print(f"Data saved to {os.path.join(data_dir, file_name)}")
     env.close()
     cv2.destroyAllWindows()
 
@@ -129,7 +127,9 @@ def train(agent, Strain, Etrain, Sval, Eval, save_path, num_epochs=10, val_freq=
 
     # Training loop across epochs
     for i in range(num_epochs // val_freq):
-        Strain, Sval, Etrain, Eval = collect_expert_data(agent, Strain, Sval, Etrain, Eval)
+        print("Collecting 5 expert trajectories...")
+        for _ in range(5):
+            Strain, Sval, Etrain, Eval = collect_expert_data(agent, Strain, Sval, Etrain, Eval)
 
         for _ in tqdm(range(val_freq), bar_format='{l_bar}{bar:100}{r_bar}{bar:-100b}', leave=False):
             optimizer.zero_grad()
