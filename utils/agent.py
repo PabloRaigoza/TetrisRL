@@ -7,7 +7,7 @@ import os
 # Constants - (Mask + Board), Holder, Queue vs 40 Next x 13 Data
 STATE_DIM  = 280
 ACTION_DIM = 8
-WRAPPED_STATE_DIM = 520
+WRAPPED_STATE_DIM = 560
 WRAPPED_ACTION_DIM = 40
 
 
