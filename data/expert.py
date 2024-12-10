@@ -18,11 +18,9 @@ args = parser.parse_args()
 data_dir = "data/BC"
 os.makedirs(data_dir, exist_ok=True)
 
-def collect_data(i, base):
+def collect_data(i, base, seed):
     # Create data file name
-    num = i
-    seed = np.random.randint(0, 1000000)
-    file_name = f"BC_data_{str(num+base).zfill(3)}_{str(seed).zfill(6)}_{MAX_STEPS}.npy"
+    file_name = f"BC_data_{str(i+base).zfill(3)}_{str(seed).zfill(6)}_{MAX_STEPS}.npy"
 
 
     # Create an instance of Tetris
@@ -70,5 +68,7 @@ def collect_data(i, base):
 # Collect data with multiprocessing
 from multiprocessing import Pool
 
-with Pool(6) as p:
-    p.starmap(collect_data, [(i, 0) for i in range(args.attempts)])
+with Pool(16) as p:
+    start = len(os.listdir(data_dir))
+    seeds = np.random.randint(0, 1e7, args.attempts, dtype=np.int32)
+    p.starmap(collect_data, [(i, start, int(seed)) for i, seed in enumerate(seeds)])
