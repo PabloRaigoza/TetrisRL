@@ -17,3 +17,11 @@ index = int(sys.argv[2])
 # Printing the data
 data = np.load(path, allow_pickle=True)
 pprint(data[index])
+
+counter = 0
+for index, data in enumerate(data):
+    x = data['reward']
+    if x != 0:
+        counter += 1
+        print(index, x)
+print(counter)
