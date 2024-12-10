@@ -165,7 +165,7 @@ while not terminated and steps < MAX_STEPS:
     steps += 1
 
     # Wait for a key press
-    cv2.waitKey(10)
+    cv2.waitKey(1)
 
 
 # Close the environment
