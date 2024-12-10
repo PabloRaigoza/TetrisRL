@@ -70,5 +70,5 @@ def collect_data(i, base):
 # Collect data with multiprocessing
 from multiprocessing import Pool
 
-with Pool(4) as p:
+with Pool(6) as p:
     p.starmap(collect_data, [(i, 0) for i in range(args.attempts)])
