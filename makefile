@@ -13,7 +13,7 @@ collect:
 	venv/bin/python -m data.collect
 
 expert:
-	venv/bin/python -m data.expert --attempts 94
+	venv/bin/python -m data.expert --attempts 100
 
 replay:
 	venv/bin/python -m data.replay
@@ -24,7 +24,7 @@ stats:
 
 # Training
 bc:
-	venv/bin/python -m methods.bc --model AgentM2 --epochs 10000 --val_freq 100
+	venv/bin/python -m methods.bc --model AgentM3 --grouped true --epochs 10000 --val_freq 100
 
 dagger:
 	venv/bin/python -m methods.dagger --epochs 500 --val_freq 100

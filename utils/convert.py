@@ -66,7 +66,8 @@ def get_unwrapped_BC_data() -> np.ndarray:
 
 # Functions to convert data dictionary to wrapped state
 def convert_wrapped_state(data: dict) -> np.ndarray:
-    return np.flatten(data)
+    # return np.flatten(data)
+    return data.flatten()
 
 
 def get_wrapped_BC_data() -> np.ndarray:
@@ -82,6 +83,7 @@ def get_wrapped_BC_data() -> np.ndarray:
         file_data = np.load(f'{path}/{file}', allow_pickle=True)
 
         for data in file_data:
+            if len(data) == 0: continue
             if isinstance(data['state'], tuple):
                 Sdata.append(convert_wrapped_state(data['state'][0]))
                 Adata.append(data['action'])
