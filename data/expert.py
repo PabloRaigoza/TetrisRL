@@ -1,4 +1,4 @@
-from tqdm import tqdm
+from multiprocessing import Pool
 import numpy as np
 import argparse
 import cv2
@@ -11,6 +11,7 @@ from utils.agent import ExpertAgent
 # Getting command line arguments
 parser = argparse.ArgumentParser(description="Test an agent")
 parser.add_argument("--attempts", type=int, default=1, help="Number of attempts to test")
+parser.add_argument("--threads", type=int, default=1, help="Number of threads to use")
 args = parser.parse_args()
 
 
@@ -65,10 +66,10 @@ def collect_data(i, base, seed):
     env.close()
     cv2.destroyAllWindows()
 
-# Collect data with multiprocessing
-from multiprocessing import Pool
 
-with Pool(16) as p:
-    start = len(os.listdir(data_dir))
-    seeds = np.random.randint(0, 1e7, args.attempts, dtype=np.int32)
-    p.starmap(collect_data, [(i, start, int(seed)) for i, seed in enumerate(seeds)])
+# Collect data with multiprocessing
+if __name__ == "__main__":
+    with Pool(args.threads) as p:
+        start = len(os.listdir(data_dir))
+        seeds = np.random.randint(0, 1e7, args.attempts, dtype=np.int32)
+        p.starmap(collect_data, [(i, start, int(seed)) for i, seed in enumerate(seeds)])

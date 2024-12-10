@@ -13,7 +13,7 @@ collect:
 	venv/bin/python -m data.collect
 
 expert:
-	venv/bin/python -m data.expert --attempts 94
+	venv/bin/python -m data.expert --attempts 100 --threads 16
 
 replay:
 	venv/bin/python -m data.replay

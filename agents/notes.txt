@@ -2,15 +2,19 @@ M1_BC10000.dat - 10000 epochs on AgentM1, BCELoss, argmax action selection
 M1_BC20000.dat - 20000 epochs on AgentM1, BCELoss, argmax action selection
 M2_BC10000.dat - 10000 epochs on AgentM2, BCELoss, argmax action selection
 M2_BC20000.dat - 20000 epochs on AgentM2, CE Loss, categorical action selection
+M3_BC10000.dat - 10000 epochs on AgentM3, CE Loss, categorical action selection
+M3_BC20000.dat - 20000 epochs on AgentM3, CE Loss, categorical action selection
+
+We got an online expert to train BC on, realized that it used different features
+than just the board, so we modified our agent to use similar features. This should
+achieve a better BC result. Note that we had to go into library source code in
+order to achieve the changes that we wanted. The environment was modified in such
+a way that pieces wouldn't be put on the leftmost column, so we have to fix that
 
 Current Issues/Work To Do:
-- Tune the architecture or hyperparameters to achieve a better BC performance.
 - Training DAgger agent for at least 10 datasets.
-- Possibly use another expert policy for BC or DAgger instead of ourselves.
+- Add more heuristics than just the 4 that the expert uses.
 
 - Right now REINFORCE dominates any starting policy, figure out how to limit this.
 - REINFORCE achieves 0 training loss quickly, but doesn't get good results.
 - Basic exploration term for REINFORCE is given, but we need to mess with it more.
-
-- Maybe give more importance to the last move that gives a reward.
-- Change the reward function to incentivize survival and line clears.
