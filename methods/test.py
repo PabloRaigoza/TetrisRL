@@ -46,7 +46,7 @@ for i in range(args.attempts):
         # Stepping through the environment
         obs, reward, terminated, truncated, info = env.step(action.item())
         attempt_reward += reward
-        observation = obs
+        observation = obs, info
         steps += 1
 
         # Delay for visualization

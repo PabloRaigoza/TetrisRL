@@ -136,7 +136,7 @@ class AgentM4(BaseAgent):
 
     def __init__(self, device: any, state_dim: int = WRAPPED_STATE_DIM,
                  hidden_dim: int = HIDDEN_DIM, action_dim: int = WRAPPED_ACTION_DIM):
-        super(AgentM3, self).__init__()
+        super(AgentM4, self).__init__()
         self.state_dim  = state_dim
         self.hidden_dim = hidden_dim
         self.action_dim = action_dim

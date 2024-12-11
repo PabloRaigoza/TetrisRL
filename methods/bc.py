@@ -79,10 +79,12 @@ def train(agent, Strain, Atrain, Sval, Aval, save_path, num_epochs=10, val_freq=
         validation_acc = str(validation_acc.item()).ljust(20)
         print(f"Epoch {ind} / {num_epochs} - Training Loss: {epoch_loss} - Validation Loss: {validation_loss} - Validation Accuracy: {validation_acc}")
 
-    # Saving model and returning
-    if save_path:
-        agent.load_state(best_model)
-        agent.save(save_path)
+        # Saving model and returning
+        if save_path:
+            # agent.load_state(best_model)
+            best_agent = model_class(device)
+            best_agent.load_state(best_model)
+            best_agent.save(save_path)
 
     return agent, training_losses, validation_losses, validation_accs
 
