@@ -1,5 +1,6 @@
-import numpy as np
+import matplotlib.pyplot as plt
 from tqdm import tqdm
+import numpy as np
 import argparse
 import torch
 import time
@@ -92,8 +93,8 @@ def collect_expert_data(agent, Strain, Sval, Etrain, Eval):
         NSdata.append(obs_vector)
         NEdata.append(expert_action)
 
-        with open(os.path.join(data_dir, file_name), "wb") as f:
-            np.save(f, data)
+        # with open(os.path.join(data_dir, file_name), "wb") as f:
+        #     np.save(f, data)
 
         # Update the observation
         observation = obs, info
@@ -106,8 +107,8 @@ def collect_expert_data(agent, Strain, Sval, Etrain, Eval):
     cv2.destroyAllWindows()
 
     split = int(0.8 * len(NSdata))
-    NStrain, NSval = torch.tensor(NSdata[:split], dtype=torch.float), torch.tensor(NSdata[split:], dtype=torch.float)
-    NEtrain, NEval = torch.tensor(NEdata[:split], dtype=torch.long), torch.tensor(NEdata[split:], dtype=torch.long)
+    NStrain, NSval = torch.tensor(NSdata[:split], dtype=torch.float).to(device), torch.tensor(NSdata[split:], dtype=torch.float).to(device)
+    NEtrain, NEval = torch.tensor(NEdata[:split], dtype=torch.long).to(device), torch.tensor(NEdata[split:], dtype=torch.long).to(device)
 
     Strain, Sval = torch.cat((Strain, NStrain), dim=0), torch.cat((Sval, NSval), dim=0)
     Etrain, Eval = torch.cat((Etrain, NEtrain), dim=0), torch.cat((Eval, NEval), dim=0)
@@ -158,13 +159,28 @@ def train(agent, Strain, Etrain, Sval, Eval, save_path, num_epochs=10, val_freq=
         validation_acc = str(validation_acc.item()).ljust(20)
         print(f"Epoch {ind} / {num_epochs} - Training Loss: {epoch_loss} - Validation Loss: {validation_loss} - Validation Accuracy: {validation_acc}")
 
-    # Saving model and returning
-    if save_path:
-        agent.load_state(best_model)
-        agent.save(save_path)
+        # Saving model and returning
+        if save_path:
+            # agent.load_state(best_model)
+            best_agent = model_class(device)
+            best_agent.load_state(best_model)
+            best_agent.save(save_path)
 
     return agent, training_losses, validation_losses, validation_accs
 
 
 agent, training_losses, validation_losses, validation_accs = \
     train(agent, Strain, Etrain, Sval, Eval, args.save, num_epochs=args.epochs, val_freq=args.val_freq)
+
+# Graphing validation loss
+plt.plot(np.arange(0, args.epochs, args.val_freq), training_losses, label="Training Loss", color="red")
+plt.plot(np.arange(0, args.epochs, args.val_freq), validation_losses, label="Validation Loss", color="green")
+plt.plot(np.arange(0, args.epochs, args.val_freq), validation_accs, label="Validation Accuracy", color="blue")
+
+plt.title("Training Over Epochs")
+plt.xlabel("Epoch")
+plt.legend()
+
+stat_path = f"stats/{args.save.split('/')[-1][:-4]}_loss.png"
+os.makedirs(os.path.dirname(stat_path), exist_ok=True)
+plt.savefig(stat_path)

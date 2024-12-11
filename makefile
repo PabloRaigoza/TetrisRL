@@ -27,7 +27,7 @@ bc:
 	venv/bin/python -m methods.bc --model AgentM4 --grouped true --epochs 25000 --val_freq 100
 
 dagger:
-	venv/bin/python -m methods.dagger --epochs 5000 --val_freq 100
+	venv/bin/python -m methods.dagger --model AgentM4 --epochs 25000 --val_freq 250
 
 reinforce:
 	venv/bin/python -m methods.reinforce --model AgentM2 --epochs 100 --val_freq 5
