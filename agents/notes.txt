@@ -30,3 +30,10 @@ Current Issues/Work To Do:
 - Right now REINFORCE dominates any starting policy, figure out how to limit this.
 - REINFORCE achieves 0 training loss quickly, but doesn't get good results.
 - Basic exploration term for REINFORCE is given, but we need to mess with it more.
+
+Looked into alter the Reinforce code slightly to get better result:
+1. Clip the gradient in update_policy, prevent the gradient to exlode
+
+2. normalized the reward_togo in compute loss, to reduce the variance
+Note: Idk if they would solve any problem, but I think they will at least help
+
