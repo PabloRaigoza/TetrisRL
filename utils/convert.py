@@ -83,6 +83,9 @@ def get_wrapped_BC_data() -> np.ndarray:
         not_empty = [data for data in file_data if len(data) > 0]
         if (len(not_empty) < 500): continue
 
+        # Assign 50% probability to load data
+        if np.random.rand() < 0.5: continue
+
         for data in not_empty:
             if isinstance(data['state'], tuple):
                 Sdata.append(convert_wrapped_state(data['state'][0]))
