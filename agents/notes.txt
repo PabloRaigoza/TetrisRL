@@ -16,7 +16,7 @@ M4_2DA25000.dat - 25000 epochs on AgentM4, CE Loss, BC init with no BC data
 M4_3DA2750.dat - 25000 epochs on AgentM4, CE Loss, BC init with BC data (stopped early cuz too long)
 M4_4DA25000.dat - 25000 epochs on AgentM4, CE Loss, BC init with BC data (only half of BC data)
 
-- M4_2D02750 pure dagger ran on 2750/250 * 5 expert corrections
+- M4_2DA2750 pure dagger ran on 2750/250 * 5 expert corrections
 - M4_4DA10000 BC init, with starting with BC data and 10000/250*5 expert corrections
 
 We got an online expert to train BC on, realized that it used different features
@@ -29,12 +29,54 @@ We were also planning on filtering the data collected by the expert to only keep
 the trajectories that have >= 750 steps (kind of the best ones). But then again it
 might be better to keep all the data so the agent can learn to recover I guess?
 
-Current Issues/Work To Do:
-- Right now REINFORCE dominates any starting policy, figure out how to limit this (averaging technique)
-- REINFORCE achieves 0 training loss quickly, but doesn't get good results.
+# REINFORCE Attempts To Fix
+- Clip the gradient in update_policy, prevent the gradient to exlode (Helpful but not enough, increased time to get 0 loss)
+- Normalized the reward_togo in compute loss, to reduce the variance (Helpful but not enough, increased time to get 0 loss)
+- Fixed training loss of zero, by clamping logits [-10, 10] to prevent log(0) (Main fix, almost never get 0 loss)
+- Save on highest reward, not on lowest loss (For better end results)
 
-Looked into alter the Reinforce code slightly to get better result:
-1. Clip the gradient in update_policy, prevent the gradient to exlode
+M4_1R100.dat - 100 epochs on AgentM4, REINFORCE, random init, lr=1e-4
+M4_2R100.dat - 100 epochs on AgentM4, REINFORCE, random init, lr=1e-5
+M4_3R100.dat - 100 epochs on AgentM4, REINFORCE, random init, lr=1e-6
+M4_4R100.dat - 100 epochs on AgentM4, REINFORCE, random init, lr=1e-6, avg loss per traj instead of sum (same for rest)
+M4_5R100.dat - 100 epochs on AgentM4, REINFORCE, random init, lr=1e-7
+M4_6R100.dat - 100 epochs on AgentM4, REINFORCE, random init, lr=1e-8
 
-2. normalized the reward_togo in compute loss, to reduce the variance
-Note: Idk if they would solve any problem, but I think they will at least help
+Loss keeps on jumping around, don't know how to prevent this. Just let it be for now.
+REINFORCE dominates (seen from high initial reward jumps down like 200 to -50ish,
+but used to be -90ish so an improvement. )
+
+M4_1RBC100.dat - 100 epochs on AgentM4, REINFORCE, BC (M4_BC25000.dat) init, lr=1e-6
+M4_2RBC100.dat - 100 epochs on AgentM4, REINFORCE, BC (M4_BC25000.dat) init, lr=1e-7
+M4_3RBC100.dat - 100 epochs on AgentM4, REINFORCE, BC (M4_BC25000.dat) init, lr=1e-8
+
+M4_1RDA100.dat - 100 epochs on AgentM4, REINFORCE, DA (M4_4DA10000.dat) init, lr=1e-7
+M4_2RDA100.dat - 100 epochs on AgentM4, REINFORCE, DA (M4_4DA10000.dat) init, lr=1e-8
+
+# REINFORCE Averaging Attempts (Thought with averaging we could have a higher lr and be fine, not the case)
+M4_1AR100.dat - 100 epochs on AgentM4, AVG-REINFORCE, random init, lr=1e-8, DEFAULT mix_freq & mix_weight
+M4_2AR100.dat - 100 epochs on AgentM4, AVG-REINFORCE, random init, lr=1e-7, DEFAULT mix_freq & mix_weight
+
+M4_1ARBC100.dat - 100 epochs on AgentM4, AVG-REINFORCE, BC (M4_BC25000.dat) init, lr=1e-8, DEFAULT mix_freq & mix_weight
+M4_2ARBC100.dat - 100 epochs on AgentM4, AVG-REINFORCE, BC (M4_BC25000.dat) init, lr=1e-7, DEFAULT mix_freq & mix_weight
+
+M4_1ARDA100.dat - 100 epochs on AgentM4, AVG-REINFORCE, DA (M4_4DA10000.dat) init, lr=1e-8, DEFAULT mix_freq & mix_weight
+M4_2ARDA100.dat - 100 epochs on AgentM4, AVG-REINFORCE, DA (M4_4DA10000.dat) init, lr=1e-7, DEFAULT mix_freq & mix_weight
+
+# REINFORCE Averaging Attempts Pt 2 (Optional: Try chaning mix_freq & mix_weight) I suggest mix_weight <= 0.2. Just for BC and DA
+
+M4_3ARBC100.dat - 100 epochs on AgentM4, AVG-REINFORCE, BC (M4_BC25000.dat) init, lr=1e-8, 0.2?
+M4_4ARBC100.dat - 100 epochs on AgentM4, AVG-REINFORCE, BC (M4_BC25000.dat) init, lr=1e-8, 0.1?
+
+M4_3ARDA100.dat - 100 epochs on AgentM4, AVG-REINFORCE, DA (M4_4DA10000.dat) init, lr=1e-8, 0.2?
+M4_4ARDA100.dat - 100 epochs on AgentM4, AVG-REINFORCE, DA (M4_4DA10000.dat) init, lr=1e-8, 0.1?
+
+# REINFORCE Averaging Attempt Pt 3 (Subsequent Models not Init Model)
+
+Things To Talk About End Of Paper:
+- We allowed agent to make any move, even if it was illegal. Since illegal move
+is -10 and end game is -100, some policies will see that making illegal moves is
+actually better than continuing to play the game and getting game over.
+- REINFORCE just doesn't seem to work, seems like there is a different between
+minimizing training loss and maximizing reward. Might be because if the trajectory
+terminates early but with "certain" moves the agent will get low loss, but also low reward.

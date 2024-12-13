@@ -11,7 +11,7 @@ from utils.environment import makeStandard, makeGrouped, MAX_STEPS
 
 
 # Getting command line arguments
-parser = argparse.ArgumentParser(description="Train a BC agent")
+parser = argparse.ArgumentParser(description="Train a REINFORCE agent")
 parser.add_argument("--agent", type=str, default=None, help="Agent path to load")
 parser.add_argument("--model", type=str, default="AgentM4", help="Agent version to use")
 parser.add_argument("--grouped", type=bool, default=False, help="Whether to use wrapped environment")
@@ -31,12 +31,11 @@ if args.agent: agent.load_path(args.agent)
 
 # Training agent (from HW4)
 class PolicyGradient:
-    def __init__(self, env, policy, device, val_freq=100, explore=False):
+    def __init__(self, env, policy, device, val_freq=100):
         self.env = env
         self.policy = policy
         self.device = device
         self.val_freq = val_freq
-        self.explore = explore
 
 
     def compute_loss(self, episode, gamma):
@@ -48,25 +47,24 @@ class PolicyGradient:
 
         gammas = (gamma ** torch.arange(length)).to(self.device)
         discounted = ep_rewards * gammas
-        rewards_togo = discounted.sum() - torch.cumsum(discounted, dim=0) + discounted
+        rewards_togo = torch.flip(torch.cumsum(torch.flip(discounted, dims=(0,)), dim=0), dims=(0,))
+        if length > 1:
+            rewards_togo = (rewards_togo - rewards_togo.mean()) / (rewards_togo.std() + 1e-9)
 
         action_logits = self.policy(ep_states)
-        action_dists = torch.softmax(action_logits, dim=1)
-        action_probs = action_dists[torch.arange(length), ep_actions].to(self.device)
-        loss = - torch.sum(torch.log(action_probs) * rewards_togo.to(self.device))
-
-        if self.explore:
-            exploration = torch.distributions.Categorical(action_dists).entropy().mean()
-            loss += 0.01 * exploration
-
+        action_dists = torch.distributions.Categorical(logits=action_logits)
+        action_probs = action_dists.probs.gather(1, ep_actions.view(-1, 1)).squeeze()
+        loss = - torch.mean(torch.log(action_probs) * rewards_togo.to(self.device))
         return loss
 
 
     def update_policy(self, episodes, optimizer, gamma):
-        optimizer.zero_grad()
         losses = torch.stack([self.compute_loss(episode, gamma) for episode in episodes])
         avg_loss = torch.mean(losses.to(self.device))
-        avg_loss.backward(); optimizer.step()
+        optimizer.zero_grad(); avg_loss.backward()
+
+        torch.nn.utils.clip_grad_norm_(self.policy.parameters(), max_norm=1.0)
+        optimizer.step()
         return avg_loss.item()
 
 
@@ -92,10 +90,10 @@ class PolicyGradient:
         optimizer = torch.optim.Adam(self.policy.parameters(), lr=lr)
 
         avg_losses, avg_rewards = [], []
-        best_loss = float('inf')
+        best_reward = float("-inf")
         best_model = None
 
-        for i in range(num_iterations):
+        for i in range(num_iterations+1):
             episodes = [self.run_episode() for _ in tqdm(range(batch_size), bar_format='{l_bar}{bar:100}{r_bar}{bar:-100b}', leave=False)]
             avg_loss = self.update_policy(episodes, optimizer, gamma)
 
@@ -104,8 +102,8 @@ class PolicyGradient:
                 avg_reward = self.evaluate(batch_size, gamma)
                 avg_rewards.append(avg_reward)
 
-                if avg_loss < best_loss:
-                    best_loss = avg_loss
+                if avg_reward > best_reward:
+                    best_reward = avg_reward
                     best_model = self.policy.state_dict()
 
                 ind = str(i).rjust(len(str(num_iterations)))
@@ -113,9 +111,10 @@ class PolicyGradient:
                 avg_reward = str(avg_reward).ljust(20)
                 print(f"Epoch {ind} / {num_iterations} - Training Loss: {avg_loss} - Validation Reward {avg_reward}")
 
-        if args.save:
-            agent.load_state(best_model)
-            agent.save(args.save)
+                if args.save:
+                    best_agent = model_class(device)
+                    best_agent.load_state(best_model)
+                    best_agent.save(args.save)
 
         return avg_losses, avg_rewards
 
@@ -132,17 +131,18 @@ class PolicyGradient:
             gammas = (gamma ** torch.arange(len(rewards))).to(self.device)
             total_reward += (rewards * gammas).sum()
 
+        self.policy.train()
         return (total_reward / num_episodes).item()
 
 
 env = makeGrouped() if args.grouped else makeStandard()
 reinforce = PolicyGradient(env, agent, device, args.val_freq)
-avg_losses, avg_rewards = reinforce.train(args.epochs, batch_size=100, gamma=1, lr=0.005)
+avg_losses, avg_rewards = reinforce.train(args.epochs, batch_size=10, gamma=1, lr=1e-8)
 
 
 # Graphing losses and rewards
-plt.plot(np.arange(0, args.epochs, args.val_freq), avg_losses, label="Training Loss", color="red")
-plt.plot(np.arange(0, args.epochs, args.val_freq), avg_rewards, label="Validation Reward", color="blue")
+plt.plot(np.arange(0, args.epochs+1, args.val_freq), avg_losses, label="Training Loss", color="red")
+plt.plot(np.arange(0, args.epochs+1, args.val_freq), avg_rewards, label="Validation Reward", color="blue")
 
 plt.title("Training Over Epochs")
 plt.xlabel("Epoch")
