@@ -69,7 +69,7 @@ def convert_wrapped_state(data: dict) -> np.ndarray:
     return data.flatten()
 
 
-def get_wrapped_BC_data() -> np.ndarray:
+def get_wrapped_BC_data(rand: bool = False) -> np.ndarray:
     path = 'data/BC'
     Sdata, Adata = [], []
     print(f'Loading data from {path}...')
@@ -84,7 +84,7 @@ def get_wrapped_BC_data() -> np.ndarray:
         if (len(not_empty) < 500): continue
 
         # Assign 50% probability to load data
-        if np.random.rand() < 0.5: continue
+        if rand and (np.random.rand() < 0.5): continue
 
         for data in not_empty:
             if isinstance(data['state'], tuple):
@@ -98,30 +98,3 @@ def get_wrapped_BC_data() -> np.ndarray:
     Sdata = np.array(Sdata)[perm]
     Adata = np.array(Adata)[perm]
     return Sdata, Adata
-
-
-def get_wrapped_DA_data() -> np.ndarray:
-    path = 'data/DA'
-    Sdata, Edata = [], []
-    print(f'Loading data from {path}...')
-
-    if not os.path.exists(path):
-        return np.array(Sdata), np.array(Edata)
-
-    # Iterate through all files in the directory
-    for file in os.listdir(path):
-        file_data = np.load(f'{path}/{file}', allow_pickle=True)
-
-        for i, data in enumerate(file_data):
-            if len(data) == 0: continue
-            if isinstance(data['state'], tuple):
-                Sdata.append(convert_wrapped_state(data['state'][0]))
-                Edata.append(data['expert_action'])
-            else:
-                Sdata.append(convert_wrapped_state(data['state']))
-                Edata.append(data['expert_action'])
-
-    perm = np.random.permutation(len(Sdata))
-    Sdata = np.array(Sdata)[perm]
-    Edata = np.array(Edata)[perm]
-    return Sdata, Edata

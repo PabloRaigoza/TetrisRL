@@ -8,7 +8,7 @@ import cv2
 import os
 
 from utils.agent import *
-from utils.convert import get_wrapped_DA_data, convert_wrapped_state, get_wrapped_BC_data
+from utils.convert import convert_wrapped_state, get_wrapped_BC_data
 from utils.environment import makeGrouped, MAX_STEPS
 
 
@@ -25,8 +25,7 @@ model_class = globals()[args.model]
 
 
 # Getting training data
-# Sdata, Edata = get_wrapped_DA_data()
-Sdata, Edata = get_wrapped_BC_data()
+Sdata, Edata = get_wrapped_BC_data(True)
 split = int(0.8 * len(Sdata))
 
 Strain, Sval = torch.tensor(Sdata[:split], dtype=torch.float), torch.tensor(Sdata[split:], dtype=torch.float)
@@ -162,7 +161,6 @@ def train(agent, Strain, Etrain, Sval, Eval, save_path, num_epochs=10, val_freq=
 
         # Saving model and returning
         if save_path:
-            # agent.load_state(best_model)
             best_agent = model_class(device)
             best_agent.load_state(best_model)
             best_agent.save(save_path)

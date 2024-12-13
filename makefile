@@ -33,8 +33,4 @@ reinforce:
 	venv/bin/python -m methods.reinforce --model AgentM3 --agent agents/M3_BC50000.dat --epochs 100 --val_freq 5 --grouped true
 
 test:
-	venv/bin/python -m methods.test --grouped true --agent agents/M4_2D02750.dat --model AgentM4 --attempts 10
-
-
-# M4_2D02750 pure dagger ran on 2750/250 * 5 expert corrections
-# M4_4DA10000 BC init, with starting with BC data and 10000/250*5 expert corrections
+	venv/bin/python -m methods.test --grouped true --agent agents/M4_4DA10000.dat --model AgentM4 --attempts 10

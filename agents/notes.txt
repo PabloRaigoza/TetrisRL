@@ -1,19 +1,23 @@
-# Unwrapped
+# Unwrapped BC
 M1_BC10000.dat - 10000 epochs on AgentM1, BCELoss, argmax action selection
 M1_BC20000.dat - 20000 epochs on AgentM1, BCELoss, argmax action selection
 M2_BC10000.dat - 10000 epochs on AgentM2, BCELoss, argmax action selection
 M2_BC20000.dat - 20000 epochs on AgentM2, CE Loss, categorical action selection
 
-# Wrapped
+# Wrapped BC
 M3_BC10000.dat - 10000 epochs on AgentM3, CE Loss, categorical action selection
 M3_BC20000.dat - 20000 epochs on AgentM3, CE Loss, categorical action selection
 M3_BC50000.dat - 50000 epochs on AgentM3, CE Loss, categorical action selection
 
-# Things to train (these filtered data)
+# Wrapped DA (these all 750 filtered)
 M4_BC25000.dat - 25000 epochs on AgentM4, CE Loss, random init
 M4_1DA25000.dat - 25000 epochs on AgentM4, CE Loss, random init with no BC data
 M4_2DA25000.dat - 25000 epochs on AgentM4, CE Loss, BC init with no BC data
-M4_3DA25000.dat - 25000 epochs on AgentM4, CE Loss, BC init with BC data
+M4_3DA2750.dat - 25000 epochs on AgentM4, CE Loss, BC init with BC data (stopped early cuz too long)
+M4_4DA25000.dat - 25000 epochs on AgentM4, CE Loss, BC init with BC data (only half of BC data)
+
+- M4_2D02750 pure dagger ran on 2750/250 * 5 expert corrections
+- M4_4DA10000 BC init, with starting with BC data and 10000/250*5 expert corrections
 
 We got an online expert to train BC on, realized that it used different features
 than just the board, so we modified our agent to use similar features. This should
@@ -26,14 +30,11 @@ the trajectories that have >= 750 steps (kind of the best ones). But then again 
 might be better to keep all the data so the agent can learn to recover I guess?
 
 Current Issues/Work To Do:
-- Add more heuristics than just the 4 that the expert uses.
-- Right now REINFORCE dominates any starting policy, figure out how to limit this.
+- Right now REINFORCE dominates any starting policy, figure out how to limit this (averaging technique)
 - REINFORCE achieves 0 training loss quickly, but doesn't get good results.
-- Basic exploration term for REINFORCE is given, but we need to mess with it more.
 
 Looked into alter the Reinforce code slightly to get better result:
 1. Clip the gradient in update_policy, prevent the gradient to exlode
 
 2. normalized the reward_togo in compute loss, to reduce the variance
 Note: Idk if they would solve any problem, but I think they will at least help
-

@@ -81,7 +81,6 @@ def train(agent, Strain, Atrain, Sval, Aval, save_path, num_epochs=10, val_freq=
 
         # Saving model and returning
         if save_path:
-            # agent.load_state(best_model)
             best_agent = model_class(device)
             best_agent.load_state(best_model)
             best_agent.save(save_path)
