@@ -156,4 +156,6 @@ class AgentM4(BaseAgent):
         h1 = self.drop(self.leaky(self.fc1(x)))
         h2 = self.drop(self.leaky(self.fc2(h1)))
         h3 = self.drop(self.leaky(self.fc3(h2)))
-        return torch.clamp(self.fc4(h3), min=-10, max=10) # Return logits
+        # return torch.clamp(self.fc4(h3), min=-10, max=10) # Return logits
+    # return torch.clamp(self.fc4(h3), min=-10, max=10) # Return logits
+        return self.fc4(h3)

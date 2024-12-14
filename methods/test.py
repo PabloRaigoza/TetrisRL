@@ -31,6 +31,8 @@ total_reward = 0
 for i in range(args.attempts):
     seed = np.random.randint(0, 1000000)
     observation = env.reset(seed=seed)
+    env.render()
+    cv2.waitKey(10000)
 
     attempt_reward = 0
     terminated = False

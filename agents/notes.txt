@@ -14,7 +14,7 @@ M4_BC25000.dat - 25000 epochs on AgentM4, CE Loss, random init
 M4_1DA25000.dat - 25000 epochs on AgentM4, CE Loss, random init with no BC data
 M4_2DA25000.dat - 25000 epochs on AgentM4, CE Loss, BC init with no BC data
 M4_3DA2750.dat - 25000 epochs on AgentM4, CE Loss, BC init with BC data (stopped early cuz too long)
-M4_4DA25000.dat - 25000 epochs on AgentM4, CE Loss, BC init with BC data (only half of BC data)
+M4_4DA10000.dat - 25000 epochs on AgentM4, CE Loss, BC init with BC data (only half of BC data)
 
 - M4_2DA2750 pure dagger ran on 2750/250 * 5 expert corrections
 - M4_4DA10000 BC init, with starting with BC data and 10000/250*5 expert corrections
